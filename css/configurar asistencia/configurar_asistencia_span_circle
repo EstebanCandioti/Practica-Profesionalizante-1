@@ -1,0 +1,11 @@
+.configurar_asistencia_day span .circle {
+      background: #ddd;
+      border-radius: 50%;
+      width: 25px;
+      height: 25px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-right: 10px;
+      font-size: 14px;
+    }

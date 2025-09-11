@@ -1,0 +1,3 @@
+.configurar_asistencia_save-btn:hover {
+      background: #000;
+    }

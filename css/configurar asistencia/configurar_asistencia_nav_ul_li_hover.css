@@ -1,0 +1,5 @@
+.configurar_asistencia_ nav ul li:hover,
+    nav ul li.active {
+      background: #000;
+    }
+    
