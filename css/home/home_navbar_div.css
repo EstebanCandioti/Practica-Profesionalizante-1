@@ -1,0 +1,5 @@
+.home_navbar_div{
+    width: 20%;
+    display: flex;
+    justify-content: space-around;
+}
