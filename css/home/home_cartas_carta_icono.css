@@ -1,3 +1,6 @@
-.home_cartas_carta_icono{
-    width: 50px;
+
+.home_cartas_carta_icono {
+    width: 40px;
+    height: auto;
+    justify-self: center;
 }

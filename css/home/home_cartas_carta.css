@@ -1,7 +1,9 @@
-.home_cartas_carta{
-    background-color: #ffff;
-    display: flex;
-    margin-top: 4rem;
-    padding: 2rem;
-    justify-content: space-around;
+.home_cartas_carta {
+    background-color: #fff;
+    display: grid;
+    grid-template-columns: 20% 40% 40%; 
+    align-items: center;
+    margin-top: 2rem;
+    padding: 1rem 2rem;
+    gap: 1rem;
 }
