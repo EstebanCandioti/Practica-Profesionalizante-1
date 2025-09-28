@@ -1,0 +1,9 @@
+.configurar_asistencia_boton{
+    margin-top: 2rem;
+    margin-right: 16%;
+    padding: 10px 60px;
+    float: right;
+    background-color: #000;
+    color: #fff;
+    border: none;
+}

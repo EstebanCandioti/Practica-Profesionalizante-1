@@ -1,0 +1,7 @@
+.home_cartas_carta{
+    background-color: #ffff;
+    display: flex;
+    margin-top: 4rem;
+    padding: 2rem;
+    justify-content: space-around;
+}

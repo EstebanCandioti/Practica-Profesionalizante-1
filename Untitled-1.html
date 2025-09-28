@@ -6,72 +6,71 @@
   <title>Configurar asistencia</title>
   <link rel="stylesheet" href="css/configurar asistencia/configuar_asistencia.css">
   <link rel="stylesheet" href="css/configurar asistencia/configurar_asistencia_container.css"> 
-  <link rel="stylesheet" href="css/configurar asistencia/configurar_asistencia_day.css">
-  <link rel="stylesheet" href="css/configurar asistencia/configurar_asistencia_day_span.css">
-  <link rel="stylesheet" href="css/configurar asistencia/configurar_asistencia_header.css">
-  <link rel="stylesheet" href="css/configurar asistencia/configurar_asistencia_header_logo.css">
+  <link rel="stylesheet" href="css/configurar asistencia/configurar_asistencia_dia.css">
+  <link rel="stylesheet" href="css/configurar asistencia/configurar_asistencia_dia_span.css">
+  <link rel="stylesheet" href="css/navbar/navbar.css">
+  <link rel="stylesheet" href="css/navbar/navbar_div.css">
+  <link rel="stylesheet" href="css/navbar/navbar_div_icono.css">
+  <link rel="stylesheet" href="/css/sidebar/sidebar_boton.css">
   <link rel="stylesheet" href="css/configurar asistencia/configurar_asistencia_main.css">
-  <link rel="stylesheet" href="css/configurar asistencia/configurar_asistencia_nav.css">
-  <link rel="stylesheet" href="css/configurar asistencia/configurar_asistencia_nav_ul.css">
-  <link rel="stylesheet" href="css/configurar asistencia/configurar_asistencia_nav_ul_li_hover.css">
-  <link rel="stylesheet" href="css/configurar asistencia/configurar_asistencia_save_btn_css"> 
-<link rel="stylesheet" href="css/configurar asistencia/configurar_asistencia_save_btn_hover_css">
-<link rel="stylesheet" href="css/configurar asistencia/configurar_asistencia_span_circle">
-<link rel="stylesheet" href="css/configurar asistencia/configurar_asistencia_ul_li.css">
-<link rel="stylesheet" href="css/configurar asistencia/configurar_asistencias_h2.css">
+  <link rel="stylesheet" href="css/configurar asistencia/configurar_asistencia_titulo.css">
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css">
+  <link rel="stylesheet" href="css/configurar asistencia/configurar_asistencia_boton.css">
 </head>
 <body class="configuar_asistencia"> 
 
   <!-- Encabezado -->
-  <header class="configuar_asistencia_header">
-    <div class="logo">🍴 Sistema de Gestión de Pedidos</div>
-    <div>Usuario 👤</div>
-  </header>
+    <header>
+        <nav class="navbar">
+            <div class="navbar_div">
+                <img src="resources/restaurant.png" alt="plato de comida" class="navbar_div_icono">
+                <p>Sistema de gestion de Pedidos</p>
+            </div>
+            <div class="navbar_div">
+                <img src="resources/usuario.png" alt="icono de usuario" class="navbar_div_icono">
+                <p>Usuario</p>
+            </div>
+        </nav>
+    </header>
 
-  <div class="configurar_asistencia_container">
-    <!-- Menú lateral -->
-    <nav class="configurar_asistencia_nav">
-      <ul class="configurar_asistencia_nav_ul">
-        <li>Home</li>
-        <li>Ver Menú</li>
-        <li>Realizar pedido</li>
-        <li class="configurar_asistencia_nav_ul_li_hover">Configurar asistencia</li>
-        <li>Notificaciones</li>
-        <li>Historial de pedidos</li>
-      </ul>
-    </nav>
+  <section class="w3-sidebar w3-dark-grey w3-bar-block w3-center" style="width:25%">
+        <a href="/index.html" class="w3-bar-item w3-button  w3-padding sidebar_boton w3-margin-top">Home</a>
+        <a href="#" class="w3-bar-item w3-button sidebar_boton">Ver Menu</a>
+        <a href="#" class="w3-bar-item w3-button sidebar_boton">Realizar Pedido</a>
+        <a href="#" class="w3-bar-item w3-button w3-black sidebar_boton">Configurar Asistencia</a>
+        <a href="#" class="w3-bar-item w3-button sidebar_boton">Notificaciones</a>
+    </section>
 
     <!-- Contenido -->
-    <main class="configurar_asistencia_main">
-      <h2 class="configurar_asistencias_h2">Configurar asistencia</h2>
-
-      <div class="configurar_asistencia_day">
-        <span class="configurar_asistencia_day_span"><div class="configurar_asistencia_span_circle"></div>Lunes</span>
+    <section class="w3-container configurar_asistencia_main">
+      <h1 class="configurar_asistencia_titulo">Dias de la semana</h1>
+      <div class="configurar_asistencia_dia">
+        <span class="configurar_asistencia_dia_span"><div class="configurar_asistencia_span_circle"></div>Lunes</span>
         <input type="checkbox">
       </div>
 
-      <div class="configurar_asistencia_day">
-        <span class="configurar_asistencia_day_span"><div class="configurar_asistencia_span_circle"></div>Martes</span>
+      <div class="configurar_asistencia_dia">
+        <span class="configurar_asistencia_dia_span"><div class="configurar_asistencia_span_circle"></div>Martes</span>
         <input type="checkbox" checked>
       </div>
 
-      <div class="configurar_asistencia_day">
-        <span class="configurar_asistencia_day_span"><div class="configurar_asistencia_span_circle"></div>Miércoles</span>
+      <div class="configurar_asistencia_dia">
+        <span class="configurar_asistencia_dia_span"><div class="configurar_asistencia_span_circle"></div>Miércoles</span>
         <input type="checkbox" checked>
       </div>
 
-      <div class="configurar_asistencia_day">
-        <span class="configurar_asistencia_day_span"><div class="configurar_asistencia_span_circle"></div>Jueves</span>
+      <div class="configurar_asistencia_dia">
+        <span class="configurar_asistencia_dia_span"><div class="configurar_asistencia_span_circle"></div>Jueves</span>
         <input type="checkbox">
       </div>
 
-      <div class="configurar_asistencia_day">
-        <span class="configurar_asistencia_day_span"><div class="configurar_asistencia_span_circle"></div>Viernes</span>
+      <div class="configurar_asistencia_dia">
+        <span class="configurar_asistencia_dia_span"><div class="configurar_asistencia_span_circle"></div>Viernes</span>
         <input type="checkbox">
       </div>
 
-      <button class="configurar_asistencia_save-btn">Guardar</button>
-    </main>
+      <button class="configurar_asistencia_boton">Guardar</button>
+    </section>
   </div>
 
 </body>

@@ -1,0 +1,9 @@
+.navbar{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding-bottom: 1rem;
+    padding-top: 0.5em;
+    align-items: center;
+    height: 10vh;
+}

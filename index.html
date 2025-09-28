@@ -1,48 +1,76 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="utf-8">
-    <title>Page Title</title>
+    <title>Home</title>
     <meta name="description" content="Roughly 155 characters">
     <link rel="stylesheet" href="css/home/home.css">
-    <link rel="stylesheet" href="css/home/home_icono.css">
-    <link rel="stylesheet" href="css/home/home_navbar.css">
-    <link rel="stylesheet" href="css/home/home_navbar_div.css">
+    <link rel="stylesheet" href="css/navbar/navbar.css">
+    <link rel="stylesheet" href="css/navbar/navbar_div.css">
+    <link rel="stylesheet" href="css/navbar/navbar_div_icono.css">
+    <link rel="stylesheet" href="css/sidebar/sidebar_boton.css">
+    <!--Clase sidebar w3School-->
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css">
+    <link rel="stylesheet" href="css/home/home_cartas.css">
+    <link rel="stylesheet" href="css/home/home_cartas_carta.css">
+    <link rel="stylesheet" href="css/home/home_cartas_carta_icono.css">
+    <link rel="stylesheet" href="css/home/home_cartas_carta_titulo.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
     <script src="script.js"></script>
-  </head>
-  <body>
+</head>
+
+<body>
     <header>
-  <nav class="home_navbar">  
-    <div class="home_navbar_div">
-        <img src="resources/restaurant.png" alt="plato de comida" class="home_icono">
-        <p>Sistema de gestion de Pedidos</p>
+        <nav class="navbar">
+            <div class="navbar_div">
+                <img src="resources/restaurant.png" alt="plato de comida" class="navbar_div_icono">
+                <p>Sistema de gestion de Pedidos</p>
+            </div>
+            <div class="navbar_div">
+                <img src="resources/usuario.png" alt="icono de usuario" class="navbar_div_icono">
+                <p>Usuario</p>
+            </div>
+        </nav>
+    </header>
+    <!-- Sidebar -->
+    <section class="w3-sidebar w3-dark-grey w3-bar-block w3-center" style="width:25%">
+        <a href="#" class="w3-bar-item w3-button w3-black w3-padding sidebar_boton w3-margin-top">Home</a>
+        <a href="#" class="w3-bar-item w3-button sidebar_boton">Ver Menu</a>
+        <a href="#" class="w3-bar-item w3-button sidebar_boton">Realizar Pedido</a>
+        <a href="/Untitled-1.html" class="w3-bar-item w3-button sidebar_boton">Configurar Asistencia</a>
+        <a href="#" class="w3-bar-item w3-button sidebar_boton">Notificaciones</a>
+    </section>
+    <!-- w3 container permite mantener el formato espaciando cada carta del section-->
+    <section class="w3-container home_cartas">
+        <div class="home_cartas_carta">
+            <img src="resources/calendario.png" alt="calendarios" class="home_cartas_carta_icono">
+            <h5 class="home_cartas_carta_titulo">Dias de asistencia</h5>
+            <p>Lunes, Martes, Miercoles, Jueves, Viernes</p>
+        </div>
+        <div class="home_cartas_carta">
+            <img src="resources/reloj.png" alt="reloj" class="home_cartas_carta_icono">
+            <h5 class="home_cartas_carta_titulo">Ultimo pedido</h5>
+            <p>Lunes 15/08</p>
+            <img src="resources/campanilla.png" alt="campanilla" class="home_cartas_carta_icono">
+            <p>Milanesa de pollo</p>
+        </div>
+        <div class="home_cartas_carta">
+            <img src="resources/alerta.png" alt="alerta" class="home_cartas_carta_icono">
+            <p>Tenes hasta las 10:30hs para realizar tu pedido</p>
+        </div>
+        <div class="home_cartas_carta">
+            <img src="resources/atencion.png" alt="camp" class="home_cartas_carta_icono">
+            <h5 class="home_cartas_carta_titulo">Aviso</h5>
+            <p>No realizaste tu pedido de hoy</p>
+        </div>
+        <div class="home_cartas_carta">
+            <img src="resources/notificacion.png" alt="camp" class="home_cartas_carta_icono">
+            <h5 class="home_cartas_carta_titulo">Notificaciones</h5>
+            <p>No tiene Notificaciones nuevas</p>
+        </div>
+    </section>
 
-    </div>
-  </nav>
-</header>
-<main role="main">
-  <article>
-    <h2>Title 1</h2>
-    <p>Content 1</p>
-  </article>
-  <article>
-    <h2>Title 2</h2>
-    <p>Content 2</p>
-  </article>
-</main>
-<section>
-  A group of related content
-</section>
-<aside>
-  Sidebar
-</aside>
-<footer>
-  <p>&copy; HTML Cheat Sheet</p>
-  <address>
-    Contact <a href="mailto:me@html6.com">me</a>
-  </address>
-</footer>
-  </body>
+</body>
+
 </html>
-

@@ -1,0 +1,9 @@
+.configurar_asistencia_dia{
+    background-color: #fff;
+    padding: 20px 60px;
+    margin-top: 5rem;
+    margin-left:15rem;
+    margin-right: 15rem;
+    display: flex;
+    justify-content: space-between;
+}
