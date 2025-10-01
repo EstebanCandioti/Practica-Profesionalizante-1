@@ -1,0 +1,4 @@
+.realizar_pedido_container_cartas{
+    display: flex;
+    justify-content: space-between;
+}

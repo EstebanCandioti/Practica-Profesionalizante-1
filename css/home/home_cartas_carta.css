@@ -3,7 +3,7 @@
     display: grid;
     grid-template-columns: 20% 40% 40%; 
     align-items: center;
-    margin-top: 2rem;
+    margin-top: 4.5rem;
     padding: 1rem 2rem;
     gap: 1rem;
 }

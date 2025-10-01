@@ -1,0 +1,5 @@
+.realizar_pedido_container_dias{
+    display: flex;
+    justify-content: space-evenly;
+    margin-top: 3rem;
+}
