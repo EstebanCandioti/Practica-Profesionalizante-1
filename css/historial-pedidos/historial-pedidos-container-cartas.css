@@ -1,0 +1,8 @@
+.historial-pedidos-container-cartas{
+    background-color: #ffff;
+    display: flex;
+    margin-top: 4rem;
+    padding: 2rem;
+    justify-content: space-between;
+
+}
