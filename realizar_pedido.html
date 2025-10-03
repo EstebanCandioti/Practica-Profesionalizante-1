@@ -2,23 +2,62 @@
 <html lang="es">
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Realizar Pedido</title>
     <link rel="stylesheet" href="css/navbar/navbar.css" />
     <link rel="stylesheet" href="css/navbar/navbar_div.css" />
     <link rel="stylesheet" href="css/navbar/navbar_div_icono.css" />
-    <link rel="stylesheet" href="css/sidebar/sidebar_boton.css" />
+    <link rel="stylesheet" href="css/sidebar/sidebar.css" />
+    <link rel="stylesheet" href="css/body.css" />
+    <!--Bootstrap-->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+      crossorigin="anonymous"
+    />
     <!--Clase sidebar w3School-->
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css" />
-    <link rel="stylesheet" href="css/realizar_pedido/realizar_pedido_container.css">
-    <link rel="stylesheet" href="css/realizar_pedido/realizar_pedido_container_titulo.css">
-    <link rel="stylesheet" href="/css/realizar_pedido/realizar_pedido_container_cartas_carta.css">
-    <link rel="stylesheet" href="/css/realizar_pedido/realizar_pedido_container_cartas_carta_foto.css">
-    <link rel="stylesheet" href="/css/realizar_pedido/realizar_pedido_container_cartas_carta_texto.css">
-    <link rel="stylesheet" href="/css/realizar_pedido/realizar_pedido_container_cartas_carta_input.css">
-    <link rel="stylesheet" href="/css/realizar_pedido/realizar_pedido_container_cartas.css">
-    <link rel="stylesheet" href="/css/realizar_pedido/realizar_pedido_container_boton.css">
-    <link rel="stylesheet" href="/css/realizar_pedido/realizar_pedido_container_dias.css">
-    <link rel="stylesheet" href="/css/realizar_pedido/realizar_pedido_container_dias_dia.css">
+    <link
+      rel="stylesheet"
+      href="css/realizar_pedido/realizar_pedido_container.css"
+    />
+    <link
+      rel="stylesheet"
+      href="css/realizar_pedido/realizar_pedido_container_titulo.css"
+    />
+    <link
+      rel="stylesheet"
+      href="/css/realizar_pedido/realizar_pedido_container_cartas_carta.css"
+    />
+    <link
+      rel="stylesheet"
+      href="/css/realizar_pedido/realizar_pedido_container_cartas_carta_foto.css"
+    />
+    <link
+      rel="stylesheet"
+      href="/css/realizar_pedido/realizar_pedido_container_cartas_carta_texto.css"
+    />
+    <link
+      rel="stylesheet"
+      href="/css/realizar_pedido/realizar_pedido_container_cartas_carta_input.css"
+    />
+    <link
+      rel="stylesheet"
+      href="/css/realizar_pedido/realizar_pedido_container_cartas.css"
+    />
+    <link
+      rel="stylesheet"
+      href="/css/realizar_pedido/realizar_pedido_container_boton.css"
+    />
+    <link
+      rel="stylesheet"
+      href="/css/realizar_pedido/realizar_pedido_container_dias.css"
+    />
+    <link
+      rel="stylesheet"
+      href="/css/realizar_pedido/realizar_pedido_container_dias_dia.css"
+    />
   </head>
   <body>
     <header>
@@ -41,47 +80,146 @@
         </div>
       </nav>
     </header>
-    <!-- Sidebar -->
-    <section
-      class="w3-sidebar w3-dark-grey w3-bar-block w3-center"
-      style="width: 25%">
-      <a href="/index.html" class="w3-bar-item w3-button  w3-padding sidebar_boton w3-margin-top">Home</a>
-      <a href="#" class="w3-bar-item w3-button sidebar_boton">Ver Menu</a>
-      <a href="/realizar_pedido.html" class="w3-bar-item w3-button w3-black sidebar_boton">Realizar Pedido</a>
-      <a href="/configurar_asistencia.html" class="w3-bar-item w3-button sidebar_boton">Configurar Asistencia</a>
-      <a href="#" class="w3-bar-item w3-button sidebar_boton">Notificaciones</a>
-    </section>
-
-    <section class=" w3-container realizar_pedido_container">
-        <h1 class="realizar_pedido_container_titulo"> Menus Disponibles</h1>
+    <div class="body">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <ul class="sidebar_lista">
+          <li class="sidebar_lista_item">
+            <img
+              src="/resources/casa.png"
+              alt=""
+              class="sidebar_lista_item_icono"
+            />
+            <div class="sidebar_esconder">
+              <button class="sidebar_esconder_boton">
+                <a href="/index.html" class="sidebar_esconder_boton_link">Home</a>
+              </button>
+            </div>
+          </li>
+          <li class="sidebar_lista_item">
+            <img
+              src="/resources/menu.png"
+              alt=""
+              class="sidebar_lista_item_icono"
+            />
+            <div class="sidebar_esconder">
+              <button class="sidebar_esconder_boton">
+                <a href="#" class="sidebar_esconder_boton_link">Ver menu</a>
+              </button>
+            </div>
+          </li>
+          <li class="sidebar_lista_item">
+            <img
+              src="/resources/pedido.png"
+              alt=""
+              class="sidebar_lista_item_icono"
+            />
+            <div class="sidebar_esconder">
+              <button class="sidebar_esconder_boton">
+                <a
+                  href="realizar_pedido.html"
+                  class="sidebar_esconder_boton_link"
+                  >Realizar pedido</a>
+              </button>
+            </div>
+          </li>
+          <li class="sidebar_lista_item">
+            <img
+              src="/resources/asistencia.png"
+              alt=""
+              class="sidebar_lista_item_icono"
+              />
+            <div class="sidebar_esconder">
+              <button class="sidebar_esconder_boton">
+                <a
+                  href="configurar_asistencia.html"
+                  class="sidebar_esconder_boton_link"
+                  >Configurar asistencia</a>
+              </button>
+            </div>
+          </li>
+          <li class="sidebar_lista_item">
+            <img
+              src="/resources/notificacion.png"
+              alt=""
+              class="sidebar_lista_item_icono"
+            />
+            <div class="sidebar_esconder">
+              <button class="sidebar_esconder_boton">
+                <a href="#" class="sidebar_esconder_boton_link"
+                  >Ver notificaciones</a>
+              </button>
+            </div>
+          </li>
+        </ul>
+      </aside>
+      <section class="w3-container container-fluid">
+        <h1 class="realizar_pedido_container_titulo">Menus Disponibles</h1>
         <div class="realizar_pedido_container_dias">
-            <button class="realizar_pedido_container_dias_dia"> Lunes</button>
-            <button class="realizar_pedido_container_dias_dia">Martes</button>
-            <button class="realizar_pedido_container_dias_dia">Miercoles</button>
-            <button class="realizar_pedido_container_dias_dia">Jueves</button>
-            <button class="realizar_pedido_container_dias_dia">Viernes</button>
+          <button class="realizar_pedido_container_dias_dia">Lunes</button>
+          <button class="realizar_pedido_container_dias_dia">Martes</button>
+          <button class="realizar_pedido_container_dias_dia">Miercoles</button>
+          <button class="realizar_pedido_container_dias_dia">Jueves</button>
+          <button class="realizar_pedido_container_dias_dia">Viernes</button>
         </div>
+        <div class="realizar_pedido_container_cartas row">
+          <div class="realizar_pedido_container_cartas_carta col-3">
+            <img
+              src="/resources/milanesa.jpg"
+              alt="milanesa de pollo con arroz sobre un plato"
+              class="realizar_pedido_container_cartas_carta_foto"
+            />
+            <p class="realizar_pedido_container_cartas_carta_texto">
+              Milanesa de pollo con arroz
+            </p>
+            <input
+              type="radio"
+              name="menu"
+              class="realizar_pedido_container_cartas_carta_input"
+            />
+          </div>
 
-        <div class="realizar_pedido_container_cartas">
-            <div class="realizar_pedido_container_cartas_carta">
-                <img src="/resources/milanesa.jpg" alt="milanesa de pollo con arroz sobre un plato" class="realizar_pedido_container_cartas_carta_foto">
-                <p class="realizar_pedido_container_cartas_carta_texto">Milanesa de pollo con arroz</p>
-                <input type="radio" name="menu" class="realizar_pedido_container_cartas_carta_input">
-            </div>
+          <div class="realizar_pedido_container_cartas_carta col-3">
+            <img
+              src="/resources/pizza.PNG"
+              alt="milanesa de pollo con arroz sobre un plato"
+              class="realizar_pedido_container_cartas_carta_foto"
+            />
+            <p class="realizar_pedido_container_cartas_carta_texto">Pizza</p>
+            <input
+              type="radio"
+              name="menu"
+              class="realizar_pedido_container_cartas_carta_input"
+            />
+          </div>
 
-            <div class="realizar_pedido_container_cartas_carta">
-                <img src="/resources/pizza.PNG" alt="milanesa de pollo con arroz sobre un plato" class="realizar_pedido_container_cartas_carta_foto">
-                <p class="realizar_pedido_container_cartas_carta_texto">Pizza</p>
-                <input type="radio" name="menu" class="realizar_pedido_container_cartas_carta_input">
-            </div>
-
-            <div class="realizar_pedido_container_cartas_carta">
-                <img src="/resources/ensalada cesar.PNG" alt="milanesa de pollo con arroz sobre un plato" class="realizar_pedido_container_cartas_carta_foto">
-                <p class="realizar_pedido_container_cartas_carta_texto">Ensalada cesar</p>
-                <input type="radio" name="menu" class="realizar_pedido_container_cartas_carta_input">
-            </div>
+          <div class="realizar_pedido_container_cartas_carta col-3">
+            <img
+              src="/resources/ensalada cesar.PNG"
+              alt="milanesa de pollo con arroz sobre un plato"
+              class="realizar_pedido_container_cartas_carta_foto"
+            />
+            <p class="realizar_pedido_container_cartas_carta_texto">
+              Ensalada cesar
+            </p>
+            <input
+              type="radio"
+              name="menu"
+              class="realizar_pedido_container_cartas_carta_input"
+            />
+          </div>
         </div>
+        <div class="text-center">
         <button class="realizar_pedido_container_boton">Realizar pedido</button>
-    </section>
+        </div>
+
+      </section>
+    </div>
+    <!--Bootstrap-->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+      crossorigin="anonymous"
+    ></script>
   </body>
 </html>

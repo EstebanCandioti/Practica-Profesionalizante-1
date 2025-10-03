@@ -1,4 +1,4 @@
-.configurar_asistencia_boton {
+.gestion_empleados_main_boton {
   padding: 10px 60px;
   background-color: #000;
   color: #fff;
@@ -7,7 +7,7 @@
   border-radius: 10px;
 }
 
-.configurar_asistencia_boton:hover {
+.gestion_empleados_main_boton:hover {
   background-color: rgb(95, 95, 95);
   color: #fff;
   cursor: pointer;

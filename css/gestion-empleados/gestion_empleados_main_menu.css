@@ -1,0 +1,7 @@
+.gestion_empleados_main_menu{
+    width: min(92%, 920px);
+    height: 70%;
+    padding: 0 2rem;
+    overflow: auto; /* Muestra las barras de desplazamiento solo si el contenido las necesita */
+  border: 1px solid #ccc; /* Opcional: para visualizar el cuadro */
+}
