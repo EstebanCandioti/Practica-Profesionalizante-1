@@ -1,0 +1,7 @@
+.administrar_platos_main_platos_lista_item{
+    display: grid;
+    grid-template-columns: 1fr 120px 160px;
+    padding:0 1rem ;
+    align-items: center;
+    margin: 1rem 0;
+}

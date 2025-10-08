@@ -1,0 +1,59 @@
+.sidebar {
+  background-color: darkgray;
+  width: max-content;
+  border-radius: 10px;
+  padding: 2rem 1rem;
+}
+
+.sidebar_lista {
+  list-style: none;
+  padding: 0;
+  min-height: 600px;
+  display: flex;
+  flex-direction: column;
+  gap: 3.5rem;
+}
+
+.sidebar:hover .sidebar_lista_item {
+  grid-template-columns: 40px 1fr;
+}
+
+.sidebar_lista_item {
+  padding: 0.8rem 1.3rem;
+  border-radius: 10px;
+
+  display: grid;
+  align-items: center;
+  grid-template-columns: 40px 0fr;
+
+  color: #fff;
+
+  transition: grid-template-columns 0.2s;
+}
+
+.sidebar_lista_item_icono{
+  max-width: 30px;
+}
+
+.sidebar_esconder_boton:hover {
+  background-color: rgb(95, 95, 95);
+  color: #fff;
+  cursor: pointer;
+  transition: .5s;
+  border: none;
+}
+
+.sidebar_esconder {
+  overflow: hidden;
+}
+
+.sidebar_esconder_boton_link{
+  text-decoration: none;
+}
+
+.sidebar_esconder_boton{
+  background-color: black;
+  color: #fff;
+  border-radius: 10px;
+  border: none;
+}

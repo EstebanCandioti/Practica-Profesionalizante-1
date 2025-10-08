@@ -1,4 +1,10 @@
 .configurar_asistencia_dia_span {
-    font-weight: bold;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
 }
     

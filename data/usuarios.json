@@ -1,0 +1,16 @@
+[
+  {
+    "id": 1,
+    "nombre": "María López",
+    "email": "maria@ejemplo.com",
+    "rol": "usuario",
+    "dias_asistencia": ["lu", "mi", "vi"]
+  },
+  {
+    "id": 2,
+    "nombre": "Juan Pérez",
+    "email": "juan@ejemplo.com",
+    "rol": "administrador",
+    "dias_asistencia": ["lu", "ma", "mi", "ju"]
+  }
+]

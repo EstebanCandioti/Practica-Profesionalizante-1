@@ -1,0 +1,6 @@
+.body{
+    height: 90vh;
+    background-size: cover;
+    background-color: rgb(209, 209, 209);
+    display: flex;
+}

@@ -1,9 +1,17 @@
-.configurar_asistencia_boton{
-    margin-top: 2rem;
-    margin-right: 16%;
-    padding: 10px 60px;
-    float: right;
-    background-color: #000;
-    color: #fff;
-    border: none;
+.configurar_asistencia_boton {
+  padding: 10px 60px;
+  background-color: #000;
+  color: #fff;
+  border: none;
+  width: min(92%, 920px);
+  border-radius: 10px;
+  box-shadow: 0 5px 12px rgba(0,0,0,.08);
+}
+
+.configurar_asistencia_boton:hover {
+  background-color: rgb(95, 95, 95);
+  color: #fff;
+  cursor: pointer;
+  transition: 0.5s;
+  border: none;
 }

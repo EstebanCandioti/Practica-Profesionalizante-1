@@ -1,0 +1,16 @@
+.gestion_empleados_main_boton {
+  padding: 10px 60px;
+  background-color: #000;
+  color: #fff;
+  border: none;
+  width: min(92%, 920px);
+  border-radius: 10px;
+}
+
+.gestion_empleados_main_boton:hover {
+  background-color: rgb(95, 95, 95);
+  color: #fff;
+  cursor: pointer;
+  transition: 0.5s;
+  border: none;
+}

@@ -1,4 +1,8 @@
 .realizar_pedido_container_cartas{
+    gap: 20px;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
+    flex-wrap: nowrap;
+    margin-bottom: 3rem;
+    margin-top: 3rem;
 }

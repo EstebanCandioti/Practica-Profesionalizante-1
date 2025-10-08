@@ -1,49 +1,82 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Configurar asistencia</title>
   <link rel="stylesheet" href="css/configurar asistencia/configuar_asistencia.css">
-  <link rel="stylesheet" href="css/configurar asistencia/configurar_asistencia_container.css"> 
+  <link rel="stylesheet" href="css/configurar asistencia/configurar_asistencia_container.css">
   <link rel="stylesheet" href="css/configurar asistencia/configurar_asistencia_dia.css">
   <link rel="stylesheet" href="css/configurar asistencia/configurar_asistencia_dia_span.css">
   <link rel="stylesheet" href="css/navbar/navbar.css">
   <link rel="stylesheet" href="css/navbar/navbar_div.css">
   <link rel="stylesheet" href="css/navbar/navbar_div_icono.css">
-  <link rel="stylesheet" href="/css/sidebar/sidebar_boton.css">
+  <link rel="stylesheet" href="/css/sidebar/sidebar.css">
   <link rel="stylesheet" href="css/configurar asistencia/configurar_asistencia_main.css">
   <link rel="stylesheet" href="css/configurar asistencia/configurar_asistencia_titulo.css">
   <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css">
   <link rel="stylesheet" href="css/configurar asistencia/configurar_asistencia_boton.css">
   <link rel="stylesheet" href="/css/configurar asistencia/configurar_asistencia_checkbox.css">
+  <link rel="stylesheet" href="css/body.css">
 </head>
-<body class="configuar_asistencia"> 
+
+<body>
 
   <!-- Encabezado -->
-    <header>
-        <nav class="navbar">
-            <div class="navbar_div">
-                <img src="resources/restaurant.png" alt="plato de comida" class="navbar_div_icono">
-                <p>Sistema de gestion de Pedidos</p>
-            </div>
-            <div class="navbar_div">
-                <img src="resources/usuario.png" alt="icono de usuario" class="navbar_div_icono">
-                <p>Usuario</p>
-            </div>
-        </nav>
-    </header>
-
-  <section class="w3-sidebar w3-dark-grey w3-bar-block w3-center" style="width:25%">
-        <a href="/index.html" class="w3-bar-item w3-button  w3-padding sidebar_boton w3-margin-top">Home</a>
-        <a href="#" class="w3-bar-item w3-button sidebar_boton">Ver Menu</a>
-        <a href="/realizar_pedido.html" class="w3-bar-item w3-button sidebar_boton">Realizar Pedido</a>
-        <a href="/configurar_asistencia.html" class="w3-bar-item w3-button w3-black sidebar_boton">Configurar Asistencia</a>
-        <a href="#" class="w3-bar-item w3-button sidebar_boton">Notificaciones</a>
-    </section>
-
+  <header>
+    <nav class="navbar">
+      <div class="navbar_div">
+        <img src="resources/restaurant.png" alt="plato de comida" class="navbar_div_icono">
+        <p>Sistema de gestion de Pedidos</p>
+      </div>
+      <div class="navbar_div">
+        <img src="resources/usuario.png" alt="icono de usuario" class="navbar_div_icono">
+        <p>Usuario</p>
+      </div>
+    </nav>
+  </header>
+  <div class="body">
+    <aside class="sidebar">
+      <ul class="sidebar_lista">
+        <li class="sidebar_lista_item">
+          <img src="/resources/casa.png" alt="" class="sidebar_lista_item_icono">
+          <div class="sidebar_esconder">
+            <button class="sidebar_esconder_boton"><a href="/index.html"
+                class="sidebar_esconder_boton_link">Home</a></button>
+          </div>
+        </li>
+        <li class="sidebar_lista_item">
+          <img src="/resources/menu.png" alt="" class="sidebar_lista_item_icono">
+          <div class="sidebar_esconder">
+            <button class="sidebar_esconder_boton"><a href="#" class="sidebar_esconder_boton_link">Ver menu</a></button>
+          </div>
+        </li>
+        <li class="sidebar_lista_item">
+          <img src="/resources/pedido.png" alt="" class="sidebar_lista_item_icono">
+          <div class="sidebar_esconder">
+            <button class="sidebar_esconder_boton"><a href="realizar_pedido.html"
+                class="sidebar_esconder_boton_link">Realizar pedido</a></button>
+          </div>
+        </li>
+        <li class="sidebar_lista_item">
+          <img src="/resources/asistencia.png" alt="" class="sidebar_lista_item_icono">
+          <div class="sidebar_esconder">
+            <button class="sidebar_esconder_boton"><a href="configurar_asistencia.html"
+                class="sidebar_esconder_boton_link">Configurar asistencia</a></button>
+          </div>
+        </li>
+        <li class="sidebar_lista_item">
+          <img src="/resources/notificacion.png" alt="" class="sidebar_lista_item_icono">
+          <div class="sidebar_esconder">
+            <button class="sidebar_esconder_boton"><a href="#" class="sidebar_esconder_boton_link">Ver
+                notificaciones</a></button>
+          </div>
+        </li>
+      </ul>
+    </aside>
     <!-- Contenido -->
-    <section class="w3-container configurar_asistencia_main">
+    <section class="configurar_asistencia_main">
       <h1 class="configurar_asistencia_titulo">Dias de la semana</h1>
       <div class="configurar_asistencia_dia">
         <span class="configurar_asistencia_dia_span"><div class="configurar_asistencia_span_circle"></div>Lunes</span>
@@ -75,4 +108,5 @@
   </div>
 
 </body>
+
 </html>

@@ -1,6 +1,15 @@
-.adm-configuracion-container-boton{
-   margin: 4rem 15%;
-   padding: 1rem 20rem;
-   background-color: black;
-   width: 60%;
+.adm-configuracion-container-boton {
+  background-color: black;
+  width: min(92%, 920px);
+  margin-top: 3rem;
+  padding: 2rem;
+  color: #fff;
+}
+
+.adm-configuracion-container-boton:hover {
+  background-color: rgb(95, 95, 95);
+  color: #fff;
+  cursor: pointer;
+  transition: 0.5s;
+  border: none;
 }
