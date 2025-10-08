@@ -1,0 +1,58 @@
+[
+  {
+    "id": "h1",
+    "usuario_id": "1",
+    "plato_id": "p1",
+    "fecha": "2025-06-25",
+    "estado": "confirmado"
+  },
+  {
+    "id": "h2",
+    "usuario_id": "1",
+    "plato_id": "p2",
+    "fecha": "2025-06-22",
+    "estado": "confirmado"
+  },
+  {
+    "id": "h3",
+    "usuario_id": "1",
+    "plato_id": "p5",
+    "fecha": "2025-06-21",
+    "estado": "confirmado"
+  },
+  {
+    "id": "h4",
+    "usuario_id": "2",
+    "plato_id": "p4",
+    "fecha": "2025-07-02",
+    "estado": "pendiente"
+  },
+  {
+    "id": "h5",
+    "usuario_id": "2",
+    "plato_id": "p6",
+    "fecha": "2025-07-04",
+    "estado": "cancelado"
+  },
+  {
+    "id": "h6",
+    "usuario_id": "1",
+    "plato_id": "p7",
+    "fecha": "2025-07-05",
+    "estado": "confirmado"
+  },
+  {
+    "id": "h7",
+    "usuario_id": "1",
+    "plato_id": "p8",
+    "fecha": "2025-07-09",
+    "estado": "pendiente"
+  },
+  {
+    "id": "h8",
+    "usuario_id": "2",
+    "plato_id": "p3",
+    "fecha": "2025-07-10",
+    "estado": "confirmado"
+  }
+]

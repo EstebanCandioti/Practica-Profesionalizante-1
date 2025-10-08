@@ -3,3 +3,17 @@
     height: 50px;
     margin: 1rem .5rem
 }
+@media (max-width: 600px){
+.navbar_div_icono {
+    width: 35px;
+    height: 35px;
+    margin-right: 0.8rem;
+  }
+  }
+  @media (max-width: 1024px){
+      .navbar_div_icono {
+    width: 40px;
+    height: 40px;
+    margin: 0.5rem;
+  }
+  }
