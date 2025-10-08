@@ -1,0 +1,117 @@
+<html>
+
+<head>
+    <title>Administrar Feriados</title>
+    <link rel="stylesheet" href="css/sidebar/sidebar.css">
+    <link rel="stylesheet" href="/css/navbar/navbar.css">
+    <link rel="stylesheet" href="/css/navbar/navbar_div.css">
+    <link rel="stylesheet" href="/css/navbar/navbar_div_icono.css">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css">
+    <link rel="stylesheet" href="/css/body.css">
+    <link rel="stylesheet" href="/css/administrar_feriados/feriados_main.css">
+    <link rel="stylesheet" href="/css/administrar_feriados/feriados_titulo.css">
+    <link rel="stylesheet" href="/css/administrar_feriados/feriados_panel.css">
+    <link rel="stylesheet" href="/css/administrar_feriados/feriados_header.css">
+    <link rel="stylesheet" href="/css/administrar_feriados/feriados_boton.css">
+    <link rel="stylesheet" href="/css/administrar_feriados/feriados_calendario.css">
+    <link rel="stylesheet" href="/css/administrar_feriados/feriados_dow.css">
+    <link rel="stylesheet" href="/css/administrar_feriados/feriados_dias.css">
+    <link rel="stylesheet" href="/css/administrar_feriados/feriados_guardar.css">
+</head>
+
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="navbar_div">
+                <img src="resources/restaurant.png" alt="plato de comida" class="navbar_div_icono" />
+                <p>Sistema de gestion de Pedidos</p>
+            </div>
+            <div class="navbar_div">
+                <img src="resources/usuario.png" alt="icono de usuario" class="navbar_div_icono" />
+                <p>Usuario</p>
+            </div>
+        </nav>
+    </header>
+    <div class="body">
+        <aside class="sidebar">
+            <ul class="sidebar_lista">
+                <li class="sidebar_lista_item">
+                    <img src="/resources/casa.png" alt="" class="sidebar_lista_item_icono" />
+                    <div class="sidebar_esconder">
+                        <button class="sidebar_esconder_boton">
+                            <a href="/index.html" class="sidebar_esconder_boton_link">Home</a>
+                        </button>
+                    </div>
+                </li>
+                <li class="sidebar_lista_item">
+                    <img src="/resources/menu.png" alt="" class="sidebar_lista_item_icono" />
+                    <div class="sidebar_esconder">
+                        <button class="sidebar_esconder_boton">
+                            <a href="#" class="sidebar_esconder_boton_link">Ver menu</a>
+                        </button>
+                    </div>
+                </li>
+                <li class="sidebar_lista_item">
+                    <img src="/resources/pedido.png" alt="" class="sidebar_lista_item_icono" />
+                    <div class="sidebar_esconder">
+                        <button class="sidebar_esconder_boton">
+                            <a href="realizar_pedido.html" class="sidebar_esconder_boton_link">Realizar pedido</a>
+                        </button>
+                    </div>
+                </li>
+                <li class="sidebar_lista_item">
+                    <img src="/resources/asistencia.png" alt="" class="sidebar_lista_item_icono" />
+                    <div class="sidebar_esconder">
+                        <button class="sidebar_esconder_boton">
+                            <a href="configurar_asistencia.html" class="sidebar_esconder_boton_link">Configurar
+                                asistencia</a>
+                        </button>
+                    </div>
+                </li>
+                <li class="sidebar_lista_item">
+                    <img src="/resources/notificacion.png" alt="" class="sidebar_lista_item_icono" />
+                    <div class="sidebar_esconder">
+                        <button class="sidebar_esconder_boton">
+                            <a href="#" class="sidebar_esconder_boton_link">Ver notificaciones</a>
+                        </button>
+                    </div>
+                </li>
+                <li class="sidebar_lista_item">
+                    <img src="/resources/configuracion.png" alt="" class="sidebar_lista_item_icono" />
+                    <div class="sidebar_esconder">
+                        <button class="sidebar_esconder_boton">
+                            <a href="adm-configuracion.html" class="sidebar_esconder_boton_link">Configuracion</a>
+                        </button>
+                    </div>
+                </li>
+            </ul>
+        </aside>
+        <section class="feriados_main">
+            <h1 class="feriados_titulo">Configurar Feriados</h1>
+
+            <div class="feriados_panel">
+                <div class="feriados_header">
+                    <button class="feriados_boton" id="feriados_prev" aria-label="Mes anterior"><</button>
+                    <div class="feriados_mes" id="feriados_mes"></div>
+                    <button class="feriados_boton" id="feriados_next" aria-label="Mes siguiente">></button>
+                </div>
+
+                <div class="feriados_calendario" id="feriados_calendario">
+                    <div class="feriados_dow">Lunes</div>
+                    <div class="feriados_dow">Martes</div>
+                    <div class="feriados_dow">Miércoles</div>
+                    <div class="feriados_dow">Jueves</div>
+                    <div class="feriados_dow">Viernes</div>
+                    <div class="feriados_dow">Sábado</div>
+                    <div class="feriados_dow">Domingo</div>
+                    <!-- aquí se inyectan los días -->
+                </div>
+
+                <button class="feriados_guardar" id="feriados_guardar">Guardar</button>
+            </div>
+        </section>
+    </div>
+    <script src="/js/administrar_feriados.js"></script>
+</body>
+
+</html>

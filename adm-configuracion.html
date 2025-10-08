@@ -1,36 +1,38 @@
 <!DOCTYPE html>
 <html lang="es">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Configuracion</title>
-    <meta name="description" content="Roughly 155 characters">
-    <link rel="stylesheet" type="text/css" href="css/navbar/navbar.css">
-    <link rel="stylesheet" href="css/navbar/navbar_div.css">
-    <link rel="stylesheet" href="css/navbar/navbar_div_icono.css">
-    <link rel="stylesheet" href="css/sidebar/sidebar.css">
-    <link rel="stylesheet" href="css/body.css">
-     <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css">
-     <link rel="stylesheet" href="css/adm-configuracion/adm-configuracion-container.css">
-     <link rel="stylesheet" href="css/adm-configuracion/adm-configuracion-container-boton.css">
-     <link rel="stylesheet" href="css/adm-configuracion/adm-configuracion-container-boton-a.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-    <script src="script.js"></script>
-  </head>
-  <body>
-     <header>
-        <nav class="navbar">
-            <div class="navbar_div">
-                <img src="resources/restaurant.png" alt="plato de comida" class="navbar_div_icono">
-                <p>Sistema de gestion de Pedidos</p>
-            </div>
-            <div class="navbar_div">
-                <img src="resources/usuario.png" alt="icono de usuario" class="navbar_div_icono">
-                <p>Usuario</p>
-            </div>
-        </nav>
-    </header>
-    <div class="body">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Configuracion</title>
+  <meta name="description" content="Roughly 155 characters">
+  <link rel="stylesheet" type="text/css" href="css/navbar/navbar.css">
+  <link rel="stylesheet" href="css/navbar/navbar_div.css">
+  <link rel="stylesheet" href="css/navbar/navbar_div_icono.css">
+  <link rel="stylesheet" href="css/sidebar/sidebar.css">
+  <link rel="stylesheet" href="css/body.css">
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css">
+  <link rel="stylesheet" href="css/adm-configuracion/adm-configuracion-container.css">
+  <link rel="stylesheet" href="css/adm-configuracion/adm-configuracion-container-a.css">
+  <link rel="stylesheet" href="css/adm-configuracion/adm-configuracion-container-boton.css">
+  <link rel="stylesheet" href="css/horario_limite/horario_limite.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+</head>
+
+<body>
+  <header>
+    <nav class="navbar">
+      <div class="navbar_div">
+        <img src="resources/restaurant.png" alt="plato de comida" class="navbar_div_icono">
+        <p>Sistema de gestion de Pedidos</p>
+      </div>
+      <div class="navbar_div">
+        <img src="resources/usuario.png" alt="icono de usuario" class="navbar_div_icono">
+        <p>Administrador</p>
+      </div>
+    </nav>
+  </header>
+  <div class="body">
     <aside class="sidebar">
       <ul class="sidebar_lista">
         <li class="sidebar_lista_item">
@@ -67,7 +69,7 @@
                 notificaciones</a></button>
           </div>
         </li>
-                <li class="sidebar_lista_item">
+        <li class="sidebar_lista_item">
           <img src="/resources/configuracion.png" alt="" class="sidebar_lista_item_icono">
           <div class="sidebar_esconder">
             <button class="sidebar_esconder_boton"><a href="adm-configuracion.html"
@@ -76,15 +78,42 @@
         </li>
       </ul>
     </aside>
-    
-    <!-- container configuracion -->
-    <section class="w3-container adm-configuracion-container">
-        <button class="adm-configuracion-container-boton"><a href="#"class="adm-configuracion-container-boton-a">configurar feriados</a></button>
-        <button class="adm-configuracion-container-boton"><a href="#"class="adm-configuracion-container-boton-a">configurar platos</a></button>
-        <button class="adm-configuracion-container-boton"><a href="#"class="adm-configuracion-container-boton-a">configurar horario limite de pedidos</a></button>
-        <button class="adm-configuracion-container-boton"><a href="gestion-empleados.html"class="adm-configuracion-container-boton-a">gestionar empleados</a></button>
-    </section>
-    </div>
 
-  </body>
+    <!-- container configuracion -->
+    <section class="adm-configuracion-container">
+      <a href="administrar_feriados.html" class="adm-configuracion-container-a"> configurar feriados </a>
+      <a href="/administrar_platos.html" class="adm-configuracion-container-a"> Administrar platos </a>
+      <button class="adm-configuracion-container-boton" id="horario-limite"> configurar horario limite de pedidos </button>
+      <a href="gestion-empleados.html" class="adm-configuracion-container-a"> gestionar empleados </a>
+    </section>
+
+
+    <!-- Modal -->
+    <div class="horario_limite_modal" id="horario_limite_modal" hidden>
+      <div class="horario_limite_backdrop" data-close></div>
+      <div class="horario_limite_dialog" role="dialog" aria-modal="true" aria-labelledby="hl_titulo">
+        <header class="horario_limite_header">
+          <h2 id="hl_titulo">Horario límite de pedidos</h2>
+          <button class="horario_limite_close" title="Cerrar" data-close>x</button>
+        </header>
+
+        <form class="horario_limite_form" id="horario_limite_form" action="/config/horario-limite" method="post">
+          <label class="hl_row">
+            <span>Hora límite diaria</span>
+            <input type="time" name="cutoff" required>
+          </label>
+
+          <div class="hl_hint">Ej.: si pones 10:30, los pedidos se aceptan hasta las 10:29:59.</div>
+
+          <footer class="horario_limite_footer">
+            <button type="button" class="hl_btn hl_btn--ghost" data-close>Cancelar</button>
+            <button type="submit" class="hl_btn">Guardar</button>
+          </footer>
+        </form>
+      </div>
+    </div>
+  </div>
+  <script src="/js/adm-configuracion.js"></script>
+</body>
+
 </html>

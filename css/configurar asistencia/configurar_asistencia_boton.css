@@ -5,6 +5,7 @@
   border: none;
   width: min(92%, 920px);
   border-radius: 10px;
+  box-shadow: 0 5px 12px rgba(0,0,0,.08);
 }
 
 .configurar_asistencia_boton:hover {

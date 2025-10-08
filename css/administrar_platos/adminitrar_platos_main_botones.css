@@ -1,0 +1,7 @@
+.administrar_platos_main_botones{
+    display: flex;
+    align-items: flex-start;
+    gap: 5rem;
+    width: min(92% 920px);
+    margin-top: 2rem;
+}

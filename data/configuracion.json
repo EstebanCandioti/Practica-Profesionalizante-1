@@ -1,0 +1,9 @@
+{
+  "horario_limite_pedidos": "10:30",
+  "zona_horaria": "America/Argentina/Buenos_Aires",
+  "feriados": {
+    "2025-10": ["2025-10-12", "2025-10-13"],
+    "2025-11": ["2025-11-20"],
+    "2025-12": ["2025-12-08", "2025-12-25"]
+  }
+}
