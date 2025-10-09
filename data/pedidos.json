@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "usuario_id": 1,
+    "fecha": "2025-10-05",
+    "platos": "Milanesa de pollo"
+  },
+  {
+    "id": 2,
+    "usuario_id": 1,
+    "fecha": "2025-10-07",
+    "platos": "Tarta de verduras"
+  },
+  {
+    "id": 3,
+    "usuario_id": 2,
+    "fecha": "2025-10-07",
+    "platos": "Pizza napolitana"
+  },
+  {
+    "id": 4,
+    "usuario_id": 2,
+    "fecha": "2025-10-08",
+    "platos": "Tarta de verduras"
+  }
+]
