@@ -1,8 +1,14 @@
 .historial-pedidos-container-cartas{
-    background-color: #ffff;
-    display: flex;
-    margin-top: 4rem;
-    padding: 2rem;
-    justify-content: space-between;
+  display: grid;
+  grid-template-columns: 40% 40% 20%; /* ícono | título | contenido */
+  align-items: center;
+  gap: 12px;
 
+  background: #fff;
+  border-radius: 10px;
+  padding: 5px 16px;
+  box-shadow: 0 2px 6px rgba(0,0,0,.1);
+  max-width: 900px;
+  width: 90%;
+  margin: 1rem;
 }

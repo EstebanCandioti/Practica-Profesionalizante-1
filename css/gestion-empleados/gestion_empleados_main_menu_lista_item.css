@@ -1,11 +1,65 @@
-.gestion_empleados_main_menu_lista_item{
-    list-style: none;
-    padding: 1rem;
-    border-radius: 10px;
+.gestion_empleados_main_menu_lista_item {
+ list-style: none;
+  padding: 1rem;
+  border-radius: 10px;
+  display: grid;
+  grid-template-columns: 1.5fr 0.8fr auto auto; /* columnas: nombre / rol / toggle / borrar */
+  align-items: center;
+  gap: 1rem;
+  background-color: #f8f8f8;
+  transition: background-color 0.3s;
+  margin: .5rem 0;
 }
 
-.gestion_empleados_main_menu_lista_item:hover{
-    background-color: darkgray;
-    cursor: pointer;
-    transition: .4s;
+.gestion_empleados_main_menu_lista_item:hover {
+  background-color: #e2e2e2;
+  cursor: pointer;
+}
+
+/* Info de texto */
+.gestion_empleados_main_menu_lista_item .ge_nombre {
+  font-weight: 600;
+  color: #222;
+}
+
+.gestion_empleados_main_menu_lista_item .ge_rol {
+  color: #555;
+  font-size: 0.9rem;
+  margin-left: 0.5rem;
+}
+
+/* Contenedor de botones a la derecha */
+.gestion_empleados_main_menu_lista_item .ge_btns {
+  display: flex;
+  gap: 0.6rem;
+  margin-left: auto;
+}
+
+/* Estilos base de botones */
+.gestion_empleados_main_menu_lista_item button {
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+/* Botón gris (rol) */
+.gestion_empleados_main_menu_lista_item .ge_toggle {
+  background-color: #6c757d;
+}
+.gestion_empleados_main_menu_lista_item .ge_toggle:hover {
+  background-color: #5a6268;
+  transform: scale(1.05);
+}
+
+/* Botón rojo (eliminar) */
+.gestion_empleados_main_menu_lista_item .ge_borrar {
+  background-color: #dc3545;
+}
+.gestion_empleados_main_menu_lista_item .ge_borrar:hover {
+  background-color: #c82333;
+  transform: scale(1.05);
 }

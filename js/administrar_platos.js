@@ -1,23 +1,77 @@
+import { requireAuth, getPlatos } from "./servicio.js";
 
-  // listas y botones
+/* ===================== Utilidades ===================== */
+function normalizarDia(txt){
+  return (txt || '')
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,''); // quita tildes
+}
+
+function crearItemPlato(plato){
+  const li = document.createElement('li');
+  li.className = 'administrar_platos_main_platos_lista_item';
+
+  li.innerHTML = `
+    <span>${plato.name}</span>
+    <label>
+      <input type="checkbox" class="administrar_platos_main_platos_lista_item_checkbox">
+      <span>habilitar</span>
+    </label>
+    <select class="administrar_platos_main_lista_item_dias" disabled>
+      <option value="">Día…</option>
+      <option value="lunes">Lunes</option>
+      <option value="martes">Martes</option>
+      <option value="miercoles">Miercoles</option>
+      <option value="jueves">Jueves</option>
+      <option value="viernes">Viernes</option>
+    </select>
+  `;
+
+  if (plato.imagen) li.dataset.imagen = plato.imagen;
+
+  // activar si el plato tiene día asignado
+  const chk = li.querySelector('.administrar_platos_main_platos_lista_item_checkbox');
+  const sel = li.querySelector('.administrar_platos_main_lista_item_dias');
+  const diaNorm = normalizarDia(plato.day);
+
+  if (diaNorm && ['lunes','martes','miercoles','jueves','viernes'].includes(diaNorm)) {
+    chk.checked = true;
+    sel.disabled = false;
+    sel.value = plato.day; // usa el mismo texto (con tilde si corresponde)
+    li.classList.add('ap-item-active');
+  }
+
+  return li;
+}
+
+/* ===================== Init ===================== */
+document.addEventListener('DOMContentLoaded', async () => {
+  const usuario = requireAuth('./login.html');
+  if (!usuario) return;
+
   const ul = document.querySelector('.administrar_platos_main_platos_lista');
   const btnConfirm = document.getElementById('confirmar_modificacion_platos');
   const btnOpenAdd = document.getElementById('ap-btn-agregar');
   const btnOpenDel = document.getElementById('ap-btn-borrar');
 
-  // MODALES
   const modalAdd = document.getElementById('ap-modal-agregar');
   const modalDel = document.getElementById('ap-modal-borrar');
   const formAdd = document.getElementById('ap-form-agregar');
   const inputAddNombre = document.getElementById('ap-add-nombre');
+  const inputAddImagen = document.getElementById('plato-imagen');
   const btnConfirmDel = document.getElementById('ap-confirm-borrar');
 
-  // --- Delegación de eventos en la lista:
-  // 1) Al tildar "habilitar" -> habilita el <select>, destilda -> lo deshabilita y limpia
+  if (!ul) return;
+
+  // 1) Cargar y renderizar
+  const platos = await getPlatos();
+  ul.innerHTML = '';
+  platos.forEach(p => ul.appendChild(crearItemPlato(p)));
+
+  // 2) Activar/desactivar select según checkbox
   ul.addEventListener('change', (e) => {
     const li = e.target.closest('.administrar_platos_main_platos_lista_item');
     if (!li) return;
-
     if (e.target.classList.contains('administrar_platos_main_platos_lista_item_checkbox')) {
       const sel = li.querySelector('.administrar_platos_main_lista_item_dias');
       const checked = e.target.checked;
@@ -27,21 +81,23 @@
     }
   });
 
-  // --- Confirmar: arma payload y valida
-  btnConfirm.addEventListener('click', () => {
+  // 3) Confirmar cambios
+  btnConfirm?.addEventListener('click', () => {
     const payload = [];
     let ok = true;
 
     ul.querySelectorAll('.administrar_platos_main_platos_lista_item').forEach(li => {
-      const name = li.querySelector('span').textContent.trim();
+      const name = li.querySelector('span')?.textContent.trim() || '';
       const chk = li.querySelector('.administrar_platos_main_platos_lista_item_checkbox');
       const sel = li.querySelector('.administrar_platos_main_lista_item_dias');
-      if (chk.checked) {
-        if (!sel.value) {
+      const imagen = li.dataset.imagen || '';
+
+      if (chk?.checked) {
+        if (!sel?.value) {
           ok = false;
-          sel.focus();
+          sel?.focus();
         } else {
-          payload.push({ name, day: sel.value });
+          payload.push({ name, day: sel.value, imagen });
         }
       }
     });
@@ -52,18 +108,17 @@
     }
 
     console.log('Payload listo:', payload);
-    alert('Guardado (ver consola).');
-    // TODO: fetch('/api/platos/guardar', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)})
+    alert('Guardado.');
   });
 
-  // --- Abrir/Cerrar modales (agregar / borrar)
-  function openModal(m) { m.hidden = false; setTimeout(() => m.querySelector('input,button,select')?.focus(), 0); }
-  function closeModal(m) { m.hidden = true; }
+  // 4) Modales abrir/cerrar
+  function openModal(m){ m.hidden = false; setTimeout(()=> m.querySelector('input,button,select')?.focus(), 0); }
+  function closeModal(m){ m.hidden = true; }
 
   document.addEventListener('click', (e) => {
-    if (e.target === btnOpenAdd) openModal(modalAdd);
-    if (e.target === btnOpenDel) openModal(modalDel);
-    if (e.target.hasAttribute('data-ap-close')) {
+    if (e.target.closest('#ap-btn-agregar')) openModal(modalAdd);
+    if (e.target.closest('#ap-btn-borrar')) openModal(modalDel);
+    if (e.target.closest('[data-ap-close]')) {
       const m = e.target.closest('.ap-modal');
       if (m) closeModal(m);
     }
@@ -76,39 +131,44 @@
     }
   });
 
-  // --- Submit "Agregar" -> crea <li> con tu estructura y lo inserta
-  formAdd.addEventListener('submit', (e) => {
+  // 5) Agregar nuevo plato
+  formAdd?.addEventListener('submit', (e) => {
     e.preventDefault();
     const nombre = inputAddNombre.value.trim();
+    const imagen = inputAddImagen.value.trim();
     if (!nombre) { inputAddNombre.focus(); return; }
 
-    const li = document.createElement('li');
-    li.className = 'administrar_platos_main_platos_lista_item';
-    li.innerHTML = `
-      <span>${nombre}</span>
-      <label>
-        <input type="checkbox" class="administrar_platos_main_platos_lista_item_checkbox">
-        <span>habilitar</span>
-      </label>
-      <select class="administrar_platos_main_lista_item_dias" disabled>
-        <option value="">Día…</option>
-        <option value="lu">Lunes</option>
-        <option value="ma">Martes</option>
-        <option value="mi">Miércoles</option>
-        <option value="ju">Jueves</option>
-        <option value="vi">Viernes</option>
-      </select>
-    `;
-    ul.appendChild(li);
-
+    const nuevo = { name: nombre, day: '', imagen };
+    ul.appendChild(crearItemPlato(nuevo));
     inputAddNombre.value = '';
+    if (inputAddImagen) inputAddImagen.value = '';
     closeModal(modalAdd);
   });
 
-  // --- Confirmar borrado -> elimina TODOS los que estén tildados
-  btnConfirmDel.addEventListener('click', () => {
+  // 6) Borrar los marcados
+  btnConfirmDel?.addEventListener('click', () => {
     const marcados = ul.querySelectorAll('.administrar_platos_main_platos_lista_item_checkbox:checked');
     if (!marcados.length) { alert('No hay platos marcados para borrar.'); return; }
-    marcados.forEach(chk => chk.closest('.administrar_platos_main_platos_lista_item').remove());
+    marcados.forEach(chk => chk.closest('.administrar_platos_main_platos_lista_item')?.remove());
     closeModal(modalDel);
   });
+
+  // 7) Desmarcar todos los platos
+const btnDesmarcar = document.querySelector('.administrar_platos_main_botones_boton:not([id])');
+btnDesmarcar?.addEventListener('click', () => {
+  const items = ul.querySelectorAll('.administrar_platos_main_platos_lista_item');
+  items.forEach(li => {
+    const chk = li.querySelector('.administrar_platos_main_platos_lista_item_checkbox');
+    const sel = li.querySelector('.administrar_platos_main_lista_item_dias');
+    if (chk) chk.checked = false;
+    if (sel) {
+      sel.disabled = true;
+      sel.value = '';
+    }
+    li.classList.remove('ap-item-active');
+  });
+});
+
+
+
+});

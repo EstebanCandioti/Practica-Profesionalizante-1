@@ -1,10 +1,17 @@
 [
-  { "id": "p1", "name": "Milanesa de pollo",          "days": ["lu", "mi"] },
-  { "id": "p2", "name": "Pizza napolitana",            "days": ["ma", "vi"] },
-  { "id": "p3", "name": "Risotto de verduras",         "days": ["ju"] },
-  { "id": "p4", "name": "Ensalada César",              "days": ["lu", "ju"] },
-  { "id": "p5", "name": "Tarta de verduras",           "days": ["mi"] },
-  { "id": "p6", "name": "Hamburguesa completa",        "days": ["vi"] },
-  { "id": "p7", "name": "Sopa del día",                "days": ["lu", "ma", "mi", "ju", "vi"] },
-  { "id": "p8", "name": "Empanadas de carne",          "days": ["ma", "ju"] }
+  { "id": "p1",  "name": "Milanesa de pollo",            "day": "lunes", "imagen":"resources/milanesa.jpg"},
+  { "id": "p2",  "name": "Pizza napolitana",             "day": "martes", "imagen":"resources/pizza.PNG"},
+  { "id": "p3",  "name": "Risotto de verduras",          "day": "jueves", "imagen":"resources/risotto de verduras.jpg"},
+  { "id": "p4",  "name": "Ensalada César",               "day": "viernes", "imagen":"resources/ensalada cesar.PNG"},
+  { "id": "p5",  "name": "Tarta de verduras",            "day": "miercoles", "imagen":"resources/tartas de verduras.jpeg"},
+  { "id": "p6",  "name": "Hamburguesa completa",         "day": "viernes", "imagen":"resources/hamburguesa completa.jpeg"},
+  { "id": "p7",  "name": "Sopa de calabaza",             "day": "lunes", "imagen":"resources/sopa de verduras.jpeg"},
+  { "id": "p8",  "name": "Ñoquis con salsa bolognesa",   "day": "miercoles", "imagen":"resources/noquis con bolognesa.jpeg"},
+  { "id": "p9", "name": "Fideos al pesto",              "day": "lunes", "imagen":"resources/fideso con pest.jpeg"},
+  { "id": "p10", "name": "Tarta de jamón y queso",       "day": "martes", "imagen":"resources/tartas de jamon y queso.jpg"},
+  { "id": "p11", "name": "Milanesa napolitana",          "day": "miercoles", "imagen":"resources/milanesa napolitana.jpeg"},
+  { "id": "p12", "name": "Wok de verduras con pollo",    "day": "jueves", "imagen":"resources/wok.jpeg"},
+  { "id": "p13", "name": "Sandwich de lomito",           "day": "viernes", "imagen":"resources/sandwich de lomito.jpeg"},
+  { "id": "p14", "name": "Ravioles con salsa rosa",      "day": "martes", "imagen":"resources/ravioles.jpeg"},
+  { "id": "p15", "name": "Tortilla de papas",            "day": "jueves", "imagen":"resources/tortilla de papas.jpg"}
 ]

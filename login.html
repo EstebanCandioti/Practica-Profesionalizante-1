@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Iniciar sesión</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="./css/login.css">
+</head>
+<body class="body">
+  <main class="login_layout">
+    <div class="login_shell">
+            <!-- Lado imagen -->
+    <section class="login_img_wrap">
+      <img src="./resources/comida.jpg" alt="Comidas" class="login_img">
+    </section>
+
+    <!-- Lado formulario -->
+    <section class="login_card">
+      <h1 class="login_title">Iniciar sesión</h1>
+
+      <form id="login-form" class="login_form">
+        <label class="login_label">
+          <span>Correo Electrónico</span>
+          <input type="email" id="email" placeholder="ej: juan@correo.com" required>
+        </label>
+
+        <label class="login_label">
+          <span>Contraseña</span>
+          <input type="password" id="password" placeholder="6 a 12 dígitos" required minlength="4">
+        </label>
+
+        <label class="login_check">
+          <input type="checkbox" id="remember">
+          <span>Mantener sesión iniciada</span>
+        </label>
+
+        <button type="submit" id="btn-login" class="login_btn">Iniciar Sesión</button>
+        <p id="login-msg" class="login_msg" aria-live="polite"></p>
+      </form>
+
+      <div class="login_links">
+        <span>¿No tienes cuenta?</span>
+        <a href="#" class="login_link">Registrarse</a>
+      </div>
+    </section>
+    </div>
+  </main>
+
+  <script type="module" src="./js/login.js"></script>
+</body>
+</html>

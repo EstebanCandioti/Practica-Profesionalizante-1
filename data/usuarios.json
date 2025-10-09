@@ -3,14 +3,16 @@
     "id": 1,
     "nombre": "María López",
     "email": "maria@ejemplo.com",
+    "password":"123456",
     "rol": "usuario",
-    "dias_asistencia": ["lu", "mi", "vi"]
+    "dias_asistencia": ["lunes", "miercoles", "viernes"]
   },
   {
     "id": 2,
     "nombre": "Juan Pérez",
     "email": "juan@ejemplo.com",
+    "password":"1234567",
     "rol": "administrador",
-    "dias_asistencia": ["lu", "ma", "mi", "ju"]
+    "dias_asistencia": ["lunes", "martes", "miercoles", "jueves"]
   }
 ]

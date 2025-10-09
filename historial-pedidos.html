@@ -1,49 +1,83 @@
 <!DOCTYPE html>
 <html lang="es">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Historial</title>
-    <link rel="stylesheet" type="text/css" href="css/navbar/navbar.css">
-    <link rel="stylesheet" href="css/navbar/navbar_div.css">
-    <link rel="stylesheet" href="css/navbar/navbar_div_icono.css">
-    <link rel="stylesheet" href="css/sidebar/sidebar_boton.css">
-     <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css">
-     <link rel="stylesheet" href="css/usu-historial-pedidos/pedido1.css">
-     <link rel="stylesheet" href="css/historial-pedidos/historial-pedidos-container.css">
-     <link rel="stylesheet" href="css/historial-pedidos/historial-pedidos-container-cartas.css">
-     <link rel="stylesheet" href="css/historial-pedidos/historial-pedidos-container-titulo.css">
-     <link rel="stylesheet" href="css/historial-pedidos/historial-pedidos-container-cartas-letras.css">
-     <link rel="stylesheet" href="css/historial-pedidos/historial-pedidos-container-cartas-estado.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-    <script src="script.js"></script>
-  </head>
-  <body>
-    <header>
-      
-        <nav class="navbar">
-            <div class="navbar_div">
-                <img src="resources/restaurant.png" alt="plato de comida" class="navbar_div_icono">
-                <p>Sistema de gestion de Pedidos</p>
-            </div>
-            <div class="navbar_div">
-                <img src="resources/usuario.png" alt="icono de usuario" class="navbar_div_icono">
-                <p>Usuario</p>
-            </div>
-        </nav>
-    </header>
-    <!-- Sidebar -->
-    <section class="w3-sidebar w3-dark-grey w3-bar-block w3-center" style="width:25%">
-        <a href="#" class="w3-bar-item w3-button  w3-padding sidebar_boton w3-margin-top">Home</a>
-        <a href="#" class="w3-bar-item w3-button sidebar_boton">Ver Menu</a>
-        <a href="#" class="w3-bar-item w3-button sidebar_boton">Realizar Pedido</a>
-        <a href="/Untitled-1.html" class="w3-bar-item w3-button sidebar_boton">Configurar Asistencia</a>
-        <a href="#" class="w3-bar-item w3-button sidebar_boton">Notificaciones</a>
-        <a href="/adm-configuracion.html"class="w3-bar-item w3-button w3-padding sidebar_boton w3-margin-top">configuracion</a>
-        <a href="/usu-historial-pedidos.html"class="w3-bar-item w3-button w3-black w3-padding sidebar_boton w3-margin-top">historial de pedidos</a>
-    </section>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Historial</title>
+  <link rel="stylesheet" type="text/css" href="css/navbar/navbar.css">
+  <link rel="stylesheet" href="css/navbar/navbar_div.css">
+  <link rel="stylesheet" href="css/navbar/navbar_div_icono.css">
+  <link rel="stylesheet" href="css/sidebar/sidebar_boton.css">
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css">
+  <link rel="stylesheet" href="css/usu-historial-pedidos/pedido1.css">
+  <link rel="stylesheet" href="css/historial-pedidos/historial-pedidos-container.css">
+  <link rel="stylesheet" href="css/historial-pedidos/historial-pedidos-container-cartas.css">
+  <link rel="stylesheet" href="css/historial-pedidos/historial-pedidos-container-titulo.css">
+  <link rel="stylesheet" href="css/historial-pedidos/historial-pedidos-container-cartas-letras.css">
+  <link rel="stylesheet" href="css/historial-pedidos/historial-pedidos-container-cartas-estado.css">
+  <link rel="stylesheet" href="css/body.css">
+  <link rel="stylesheet" href="css/sidebar/sidebar.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+  <script src="script.js"></script>
+</head>
+
+<body>
+  <header>
+    <nav class="navbar">
+      <div class="navbar_div">
+        <img src="resources/restaurant.png" alt="plato de comida" class="navbar_div_icono">
+        <p>Sistema de gestion de Pedidos</p>
+      </div>
+      <div class="navbar_div">
+        <img src="resources/usuario.png" alt="icono de usuario" class="navbar_div_icono">
+        <p id="nombre-usuario-header"></p>
+      </div>
+    </nav>
+  </header>
+  <div class="body">
+    <aside class="sidebar">
+      <ul class="sidebar_lista">
+        <li class="sidebar_lista_item">
+          <img src="/resources/casa.png" alt="" class="sidebar_lista_item_icono">
+          <div class="sidebar_esconder">
+            <button class="sidebar_esconder_boton"><a href="/index.html"
+                class="sidebar_esconder_boton_link">Home</a></button>
+          </div>
+        </li> 
+        <li class="sidebar_lista_item">
+          <img src="/resources/pedido.png" alt="" class="sidebar_lista_item_icono">
+          <div class="sidebar_esconder">
+            <button class="sidebar_esconder_boton"><a href="realizar_pedido.html"
+                class="sidebar_esconder_boton_link">Realizar pedido</a></button>
+          </div>
+        </li>
+        <li class="sidebar_lista_item">
+          <img src="/resources/asistencia.png" alt="" class="sidebar_lista_item_icono">
+          <div class="sidebar_esconder">
+            <button class="sidebar_esconder_boton"><a href="configurar_asistencia.html"
+                class="sidebar_esconder_boton_link">Configurar asistencia</a></button>
+          </div>
+        </li>
+        <li class="sidebar_lista_item">
+          <img src="/resources/notificacion.png" alt="" class="sidebar_lista_item_icono">
+          <div class="sidebar_esconder">
+            <button class="sidebar_esconder_boton"><a href="#" class="sidebar_esconder_boton_link">Ver
+                notificaciones</a></button>
+          </div>
+        </li>
+        <li class="sidebar_lista_item">
+          <img src="/resources/configuracion.png" alt="" class="sidebar_lista_item_icono" />
+          <div class="sidebar_esconder">
+            <button class="sidebar_esconder_boton">
+              <a href="adm-configuracion.html" class="sidebar_esconder_boton_link">Configuracion</a>
+            </button>
+          </div>
+        </li>
+      </ul>
+    </aside>
     <section class="w3-container historial-pedidos-container">
-      <h1 class="historial-pedidos-container-titulo">historial de pedidos</h1>
+      <h1 class="historial-pedidos-container-titulo">Historial de Pedidos</h1>
       <div class="historial-pedidos-container-cartas">
         <p class="historial-pedidos-container-cartas-letras">lunes 25/06/2025</p>
         <p class="historial-pedidos-container-cartas-letras">milanesa napolitana</p>
@@ -60,5 +94,8 @@
         <p class="historial-pedidos-container-cartas-estado">confirmado</p>
       </div>
     </section>
-  </body>
+  </div>
+   <script type="module" src="/js/header.js"></script>
+</body>
+
 </html>

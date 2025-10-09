@@ -1,0 +1,146 @@
+/* Layout general */
+html,
+body {
+  height: 100%;
+  margin: 0;
+  background: #efefef;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+}
+.login_layout {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+.login_img_wrap,
+.login_card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+.login_img_wrap {
+  display: none;
+}
+.login_img {
+  display: block;
+  width: auto;
+  height: 100%;
+  object-fit: fill;
+}
+
+/* Card */
+.login_card {
+  width: min(560px, 80vw);
+  padding: 0 22px;
+}
+.login_title {
+  margin: 0 0 12px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #222;
+}
+.login_form {
+  display: grid;
+  gap: 14px;
+}
+.login_label {
+  display: grid;
+  gap: 6px;
+  font-size: 14px;
+  color: #333;
+}
+.login_label input {
+  padding: 10px 12px;
+  border: 1px solid #dcdcdc;
+  border-radius: 8px;
+  outline: 0;
+}
+.login_label input:focus {
+  border-color: #111;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.08);
+}
+.login_check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #333;
+}
+
+.login_btn {
+  margin-top: 6px;
+  padding: 12px 14px;
+  width: 100%;
+  border: 0;
+  border-radius: 10px;
+  background: #111;
+  color: #fff;
+  cursor: pointer;
+}
+.login_btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.login_msg {
+  min-height: 18px;
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: #c0392b;
+}
+.login_links {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #444;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.login_link {
+  color: #111;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+/* Versión con imagen en pantallas grandes */
+@media (min-width: 980px) {
+  .login_layout {
+    grid-template-columns: min(48vw, 720px) 520px;
+    gap: 24px;
+    align-items: stretch;
+  }
+  .login_img_wrap {
+    display: block;
+    height: 680px;
+    width: 100%;
+  }
+  .login_card {
+    height: 680px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+}
+
+/* Centrar toda la página */
+html, body { height: 100%; margin: 0; background:#efefef; }
+.login_layout{
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+/* Un solo “papel” que contiene imagen + form */
+.login_shell{
+  width: min(1150px, 96vw);
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.08);
+  overflow: hidden;
+
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;   /* imagen | formulario */
+}

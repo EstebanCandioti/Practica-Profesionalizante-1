@@ -32,7 +32,7 @@
             </div>
             <div class="navbar_div">
                 <img src="resources/usuario.png" alt="icono de usuario" class="navbar_div_icono" />
-                <p>Usuario</p>
+                <p id="nombre-usuario-header"></p>
             </div>
         </nav>
     </header>
@@ -44,14 +44,6 @@
                     <div class="sidebar_esconder">
                         <button class="sidebar_esconder_boton">
                             <a href="/index.html" class="sidebar_esconder_boton_link">Home</a>
-                        </button>
-                    </div>
-                </li>
-                <li class="sidebar_lista_item">
-                    <img src="/resources/menu.png" alt="" class="sidebar_lista_item_icono" />
-                    <div class="sidebar_esconder">
-                        <button class="sidebar_esconder_boton">
-                            <a href="#" class="sidebar_esconder_boton_link">Ver menu</a>
                         </button>
                     </div>
                 </li>
@@ -110,11 +102,11 @@
                         </label>
                         <select class="administrar_platos_main_lista_item_dias" disabled>
                             <option value="">Día…</option>
-                            <option value="lu">Lunes</option>
-                            <option value="ma">Martes</option>
-                            <option value="mi">Miércoles</option>
-                            <option value="ju">Jueves</option>
-                            <option value="vi">Viernes</option>
+                            <option value="lunes">Lunes</option>
+                            <option value="martes">Martes</option>
+                            <option value="miercoles">Miercoles</option>
+                            <option value="jueves">Jueves</option>
+                            <option value="viernes">Viernes</option>
                         </select>
                     </li>
                 </ul>
@@ -134,7 +126,9 @@
                 <label class="ap-row">
                     <span>Nombre del plato</span>
                     <input type="text" id="ap-add-nombre" required placeholder="Ej: Pizza napolitana">
+                    <input type="text" id="plato-imagen" placeholder="Ruta o nombre del archivo de imagen">
                 </label>
+
                 <footer class="ap-footer">
                     <button type="button" class="ap-btn ap-btn-ghost" data-ap-close>Cancelar</button>
                     <button type="submit" class="ap-btn">Agregar</button>
@@ -160,7 +154,8 @@
             </div>
         </div>
     </div>
-    <script src="/js/administrar_platos.js"></script>
+    <script type="module" src="/js/administrar_platos.js"></script>
+     <script type="module" src="/js/header.js"></script>
 </body>
 
 </html>
