@@ -3,6 +3,7 @@
 const BASE_URL = '/data/';
 
 console.log("service.js cargo")
+
 async function getJSON(filename) {
   const response = await fetch(BASE_URL + filename);
   if (!response.ok) throw new Error(`Error al cargar ${filename}`);

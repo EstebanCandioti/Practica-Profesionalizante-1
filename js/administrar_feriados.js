@@ -1,138 +1,81 @@
-const $cal = document.getElementById("fer_cal");
-const $mes = document.getElementById("fer_mes");
-const $prev = document.getElementById("fer_prev");
-const $next = document.getElementById("fer_next");
-const $save = document.getElementById("fer_guardar");
+import { getConfig, requireAdmin } from "./servicio.js";
 
-// Estructura en memoria: { "2025-03": [ "2025-03-09", "2025-03-25" ], ... }
-let feriados = JSON.parse(localStorage.getItem("feriados_cfg") || "{}");
+document.addEventListener("DOMContentLoaded", async () => {
+  const admin = requireAdmin("./index.html");
+  if (!admin) return;
 
-// Arrancamos en hoy
-let current = new Date();
-current.setDate(1); // siempre al día 1 del mes
+  const calendarioDiv = document.getElementById("calendar");
+  const botonGuardar = document.getElementById("feriados-guardar");
 
-const dayNames = [
-  "Domingo",
-  "Lunes",
-  "Martes",
-  "Miércoles",
-  "Jueves",
-  "Viernes",
-  "Sábado",
-];
-const monthNames = [
-  "enero",
-  "febrero",
-  "marzo",
-  "abril",
-  "mayo",
-  "junio",
-  "julio",
-  "agosto",
-  "septiembre",
-  "octubre",
-  "noviembre",
-  "diciembre",
-];
+  const configuracion = await getConfig();
+  const feriadosJson = configuracion.feriados;
 
-function yyyymm(date) {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  return `${y}-${m}`;
-}
-function yyyymmdd(date) {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const d = String(date.getDate()).padStart(2, "0");
-  return `${y}-${m}-${d}`;
-}
+  const feriados = new Set();
+  for (const mes in feriadosJson) {
+    feriadosJson[mes].forEach((fecha) => feriados.add(fecha));
+  }
 
-function render() {
-  // Título
-  $mes.textContent = `${
-    monthNames[current.getMonth()]
-  } ${current.getFullYear()}`;
+  const feriadosActualizados = new Set(feriados);
+  console.log(feriadosActualizados);
 
-  // Borro días anteriores (dejo la fila de cabeceras)
-  [...$cal.querySelectorAll(".feriados_dia")].forEach((n) => n.remove());
+  const eventos = Array.from(feriadosActualizados).map((fecha) => ({
+    title: "Feriado",
+    start: fecha,
+    color: "red",
+  }));
 
-  // Cálculos de calendario (semana empieza Lunes)
-  const year = current.getFullYear();
-  const month = current.getMonth(); // 0..11
+  const calendar = new window.FullCalendar.Calendar(calendarioDiv, {
+    initialView: "dayGridMonth",
+    locale: "es",
+    selectable: true,
+    height: "auto",
+    color:"white",
+    events: eventos,
+    //Cuando se hace click en una fecha
+    dateClick: (info) => {
+      const fecha = info.dateStr;
 
-  const first = new Date(year, month, 1);
-  const last = new Date(year, month + 1, 0); // último día del mes
+      //Si ya esta marcado como feriado lo borra
+      if (feriadosActualizados.has(fecha)) {
+        feriadosActualizados.delete(fecha);
+        //Lo remueve visual
+        calendar.getEvents().forEach((evento) => {
+          if (evento.startStr === fecha) {
+            evento.remove();
+          }
+        });
+      } else {
+        feriadosActualizados.add(fecha);
+        calendar.addEvent({
+          title: "Feriado",
+          start: fecha,
+          color: "red",
+        });
+      }
+    },
+  });
 
-  // índice de columna lunes=0..domingo=6
-  const colOf = (date) => (date.getDay() + 6) % 7;
+  calendar.render();
 
-  // días “vacíos” al inicio (del mes anterior)
-  const leading = colOf(first);
+  botonGuardar.addEventListener("click", () => {
+    const nuevos = Array.from(feriadosActualizados).filter(
+      (f) => !feriados.has(f)
+    );
+    const eliminados = Array.from(feriados).filter(
+      (f) => !feriadosActualizados.has(f)
+    );
 
-  // número de celdas: 42 (6 filas x 7 cols) para estabilidad de layout
-  const totalCells = 42;
-  const startDate = new Date(first);
-  startDate.setDate(first.getDate() - leading);
-
-  for (let i = 0; i < totalCells; i++) {
-    const d = new Date(startDate);
-    d.setDate(startDate.getDate() + i);
-
-    const div = document.createElement("div");
-    div.className = "feriados_dia";
-    div.textContent = d.getDate();
-
-    const inCurrentMonth = d.getMonth() === month;
-    if (!inCurrentMonth) div.classList.add("feriados_dia--muted");
-
-    // estado feriado
-    const keyMonth = yyyymm(current);
-    const keyDay = yyyymmdd(d);
-    const isHoliday = (feriados[keyMonth] || []).includes(keyDay);
-    if (isHoliday && inCurrentMonth) div.classList.add("feriados_dia--feriado");
-
-    if (inCurrentMonth) {
-      div.addEventListener("click", () => toggleHoliday(d));
+    // Reorganizar los feriados finales por mes (para mostrar como en config.json)
+    const feriadosPorMes = {};
+    for (const fecha of feriadosActualizados) {
+      const mes = fecha.slice(0, 7); // ej. "2025-10"
+      if (!feriadosPorMes[mes]) feriadosPorMes[mes] = [];
+      feriadosPorMes[mes].push(fecha);
     }
 
-    $cal.appendChild(div);
-  }
-}
-
-function toggleHoliday(date) {
-  const keyMonth = yyyymm(current);
-  const keyDay = yyyymmdd(date);
-  feriados[keyMonth] = feriados[keyMonth] || [];
-  const arr = feriados[keyMonth];
-  const idx = arr.indexOf(keyDay);
-  if (idx === -1) arr.push(keyDay);
-  else arr.splice(idx, 1);
-  render();
-}
-
-$prev.addEventListener("click", () => {
-  current.setMonth(current.getMonth() - 1);
-  render();
-});
-$next.addEventListener("click", () => {
-  current.setMonth(current.getMonth() + 1);
-  render();
-});
-
-$save.addEventListener("click", () => {
-  localStorage.setItem("feriados_cfg", JSON.stringify(feriados));
-  // opción: descarga del JSON
-  const blob = new Blob([JSON.stringify(feriados, null, 2)], {
-    type: "application/json",
+    console.log("Nuevos feriados:", nuevos);
+    console.log("Feriados eliminados:", eliminados);
+    console.log("Estado final:", feriadosPorMes);
+    alert("Cambios listos (ver consola).");
   });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "feriados.json";
-  a.click();
-  URL.revokeObjectURL(a.href);
-  alert("Feriados guardados (y descargados como feriados.json).");
 });
-
-
-
-render();

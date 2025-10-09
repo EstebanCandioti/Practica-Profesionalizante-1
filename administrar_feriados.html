@@ -17,6 +17,7 @@
     <link rel="stylesheet" href="/css/administrar_feriados/feriados_dow.css">
     <link rel="stylesheet" href="/css/administrar_feriados/feriados_dias.css">
     <link rel="stylesheet" href="/css/administrar_feriados/feriados_guardar.css">
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css' rel='stylesheet' />
 </head>
 
 <body>
@@ -81,30 +82,14 @@
         <section class="feriados_main">
             <h1 class="feriados_titulo">Configurar Feriados</h1>
 
-            <div class="feriados_panel">
-                <div class="feriados_header">
-                    <button class="feriados_boton" id="feriados_prev" aria-label="Mes anterior"><</button>
-                    <div class="feriados_mes" id="feriados_mes"></div>
-                    <button class="feriados_boton" id="feriados_next" aria-label="Mes siguiente">></button>
-                </div>
-
-                <div class="feriados_calendario" id="feriados_calendario">
-                    <div class="feriados_dow">Lunes</div>
-                    <div class="feriados_dow">Martes</div>
-                    <div class="feriados_dow">Miércoles</div>
-                    <div class="feriados_dow">Jueves</div>
-                    <div class="feriados_dow">Viernes</div>
-                    <div class="feriados_dow">Sábado</div>
-                    <div class="feriados_dow">Domingo</div>
-                    <!-- aquí se inyectan los días -->
-                </div>
-
-                <button class="feriados_guardar" id="feriados_guardar">Guardar</button>
-            </div>
+            <div id="calendar"></div>
+            <button id="feriados-guardar" class="feriados_boton">Guardar cambios</button>
         </section>
     </div>
-    <script src="/js/administrar_feriados.js"></script>
-     <script type="module" src="/js/header.js"></script>
+                  
+    <script type="module" src="/js/administrar_feriados.js"></script>
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js'></script>
+    <script type="module" src="/js/header.js"></script>
 </body>
 
 </html>

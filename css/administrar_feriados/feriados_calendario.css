@@ -1,9 +1,0 @@
-.feriados_calendario {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 0;
-  border: 1px solid #cfd8dc;
-  border-radius: 4px;
-  overflow: hidden;
-  background: #f9fff4;
-}

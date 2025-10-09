@@ -70,10 +70,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     const li = e.target.closest('.administrar_platos_main_platos_lista_item');
     if (!li) return;
     if (e.target.classList.contains('administrar_platos_main_platos_lista_item_checkbox')) {
-      const sel = li.querySelector('.administrar_platos_main_lista_item_dias');
+      const selected = li.querySelector('.administrar_platos_main_lista_item_dias');
       const checked = e.target.checked;
-      sel.disabled = !checked;
-      if (!checked) sel.value = '';
+     selected.disabled = !checked;
+      if (!checked) selected.value = '';
       li.classList.toggle('ap-item-active', checked);
     }
   });

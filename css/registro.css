@@ -1,0 +1,139 @@
+/* Estilos básicos y sencillos */
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f2f2f2;
+}
+
+/* Tarjeta principal con imagen + formulario */
+.auth-card {
+  max-width: 1100px;
+  margin: 30px auto;
+  background: #ffffff;
+  border: 1px solid #e5e5e5;
+  display: flex;
+  gap: 0;
+}
+
+/* Lado de la imagen */
+.auth-media {
+  flex: 6;
+  min-height: 520px;
+  background: #ddd;
+}
+
+.auth-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Lado del formulario */
+.auth-panel {
+  flex: 5;
+  background: #f7f8fa;
+  padding: 30px 30px;
+}
+
+h1 {
+  margin: 0 0 8px;
+  font-size: 24px;
+}
+
+.sub {
+  margin: 0 0 18px;
+  color: #666;
+  font-size: 14px;
+}
+
+form {
+  display: block;
+}
+
+label {
+  display: block;
+  font-size: 13px;
+  color: #444;
+  margin: 12px 0 6px;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+  width: 100%;
+  padding: 11px 12px;
+  border: 1px solid #ddd;
+  background: #fff;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus {
+  outline: none;
+  border-color: #cfcfcf;
+}
+
+/* Checkbox y fila inferior */
+.check {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0 6px;
+  font-size: 14px;
+  color: #333;
+}
+
+.row {
+  margin-top: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+}
+
+.muted {
+  color: #777;
+}
+
+a {
+  color: #222;
+  text-decoration: none;
+  border-bottom: 1px dotted #aaa;
+}
+
+/* Botón */
+.btn {
+  width: 100%;
+  margin-top: 10px;
+  padding: 12px;
+  background: #222;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.btn:hover {
+  background: #111;
+}
+
+/* Mobile muy básico: imagen arriba, form abajo */
+@media (max-width: 900px) {
+  .auth-card {
+    flex-direction: column;
+    margin: 0;
+    border: none;
+    border-radius: 0;
+  }
+  .auth-media {
+    height: 220px;
+    min-height: 220px;
+  }
+  .auth-panel {
+    padding: 20px;
+  }
+}

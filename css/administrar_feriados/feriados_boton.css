@@ -1,8 +1,8 @@
-.feriados_boton {
-  border: 1px solid #ddd;
-  background: #f8f8f8;
-  border-radius: 8px;
-  width: 40px;
-  height: 32px;
-  cursor: pointer;
+.feriados_boton{
+    margin-top: 3rem;
+    background-color: #000;
+    border: none;
+    color: #fff;
+    padding: 1rem 3rem;
+    border-radius: 10px;
 }
