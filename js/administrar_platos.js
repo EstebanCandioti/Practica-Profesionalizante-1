@@ -1,6 +1,5 @@
 import { requireAuth, getPlatos } from "./servicio.js";
 
-/* ===================== Utilidades ===================== */
 function normalizarDia(txt){
   return (txt || '')
     .toLowerCase()
@@ -44,15 +43,13 @@ function crearItemPlato(plato){
   return li;
 }
 
-/* ===================== Init ===================== */
+
 document.addEventListener('DOMContentLoaded', async () => {
   const usuario = requireAuth('./login.html');
   if (!usuario) return;
 
   const ul = document.querySelector('.administrar_platos_main_platos_lista');
   const btnConfirm = document.getElementById('confirmar_modificacion_platos');
-  const btnOpenAdd = document.getElementById('ap-btn-agregar');
-  const btnOpenDel = document.getElementById('ap-btn-borrar');
 
   const modalAdd = document.getElementById('ap-modal-agregar');
   const modalDel = document.getElementById('ap-modal-borrar');

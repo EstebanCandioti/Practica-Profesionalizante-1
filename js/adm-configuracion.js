@@ -51,7 +51,6 @@ form.addEventListener('submit', (e) => {
   e.preventDefault();
   alert(`Horario límite actualizado a ${time}.`);
 
-  // Cerrar modal reutilizando tu estado hidden
   const modal = document.getElementById('horario_limite_modal');
   modal.hidden = true;
   document.activeElement?.blur();

@@ -133,7 +133,6 @@ html, body { height: 100%; margin: 0; background:#efefef; }
   padding: 24px;
 }
 
-/* Un solo “papel” que contiene imagen + form */
 .login_shell{
   width: min(1150px, 96vw);
   background: #fff;
