@@ -1,71 +1,405 @@
-// Servicio simple para leer la data simulando llamadas a una API
+// service.js
+// Servicio para comunicar el front con el back Spring Boot
 
-const BASE_URL = '/data/';
+console.log("service.js cargado");
 
-console.log("service.js cargo")
+const API_BASE_URL = "http://localhost:8080";
 
-async function getJSON(filename) {
-  const response = await fetch(BASE_URL + filename);
-  if (!response.ok) throw new Error(`Error al cargar ${filename}`);
-  return await response.json();
+// ------------------------
+// Helper genÃƒÂ©rico de fetch
+// ------------------------
+async function apiFetch(
+  path,
+  { method = "GET", headers = {}, body = null } = {}
+) {
+  const options = {
+    method,
+    headers: {
+      "Content-Type": "application/json",
+      ...headers,
+    },
+  };
+
+  if (body !== null && body !== undefined) {
+    options.body = JSON.stringify(body);
+  }
+
+  const response = await fetch(API_BASE_URL + path, options);
+
+  const responseText = await response.text().catch(() => "");
+
+  if (!response.ok) {
+    console.error("Error en apiFetch", {
+      url: API_BASE_URL + path,
+      status: response.status,
+      body: responseText,
+    });
+    // uso el mensaje del back si lo hay
+    throw new Error(
+      responseText || `Error ${response.status} al llamar a ${path}`
+    );
+  }
+
+  if (!responseText) return null;
+
+  // Si viene JSON, lo parseo, si no, devuelvo texto
+  const contentType = response.headers.get("Content-Type") || "";
+  if (contentType.includes("application/json")) {
+    return JSON.parse(responseText);
+  }
+  return responseText;
 }
 
-// --- USUARIOS ---
+// =======================
+//        USUARIOS
+// =======================
+
+// Obtiene todos los usuarios desde el back
 export async function getUsuarios() {
-  return await getJSON('usuarios.json');
+  return await apiFetch("/usuarios");
 }
 
-// --- PLATOS ---
+export async function loginUsuario({ email, password, recordarSesion }) {
+  // Tu endpoint: @PostMapping("/login") dentro de UsuarioController
+  // asumiendo que el controller estÃƒÂ¡ en /api/usuarios
+  const usuario = await apiFetch("/usuarios/login", {
+    method: "POST",
+    body: { email, password },
+  });
+
+  // Guardamos el usuario en storage (sin tocar la respuesta)
+  const storage = recordarSesion ? localStorage : sessionStorage;
+  storage.setItem("usuarioActivo", JSON.stringify(usuario));
+
+  return usuario;
+}
+
+export async function actualizarUsuario(payload) {
+  return await apiFetch(`/usuarios`, {
+    method: "POST",
+    body: payload,
+  });
+}
+
+export async function cambiarEstadoUsuario(idUsuario) {
+  return await apiFetch(`/usuarios/estado/${idUsuario}`, {
+    method: "PUT",
+  });
+}
+
+export async function registrarUsuario(datosRegistro) {
+  // datosRegistro debe respetar el DTO del back (RegistrarUsuarioDTO)
+  // { nombre, apellido, email, telefono, direccion, usuarioRestaurante, password, diasAsistencia, activo }
+  return await apiFetch("/usuarios/registrar", {
+    method: "POST",
+    body: datosRegistro,
+  });
+}
+
+// =======================
+//         PLATOS
+// =======================
+
+// Listar
 export async function getPlatos() {
-  return await getJSON('platos.json');
+  return await apiFetch("/plato"); // o "/platos" segÃƒÂºn tu controller
 }
 
-// --- CONFIGURACIÓN GENERAL ---
-export async function getConfig() {
-  return await getJSON('configuracion.json');
+// Crear
+export async function crearPlato({ nombre, descripcion, imagen, categoria }) {
+  return await apiFetch("/plato/crear", {
+    method: "POST",
+    body: { nombre, descripcion, imagen, categoria },
+  });
 }
 
-export async function getPedidos() {
-  return await getJSON('pedidos.json')
+export async function modificarPlato(idPlato, payload) {
+  if (idPlato === undefined || idPlato === null) {
+    throw new Error("modificarPlato: idPlato es undefined/null");
+  }
+
+  const idNumero = Number(idPlato);
+  if (!Number.isInteger(idNumero)) {
+    throw new Error(`modificarPlato: idPlato invÃƒÂ¡lido (${idPlato})`);
+  }
+
+  return await apiFetch(`/plato/modificar/${idNumero}`, {
+    method: "PUT",
+    body: payload,
+  });
+}
+
+// Eliminar (si existe DELETE)
+export async function cambiarEstadoPlato(idPlato) {
+  return await apiFetch(`/plato/estado/${idPlato}`, {
+    method: "DELETE",
+  });
+}
+
+// =======================
+//        MENU-DIA
+// =======================
+
+export async function getMenuDiaPorFecha(fechaISO) {
+  const query = new URLSearchParams({ fecha: fechaISO }).toString();
+  return await apiFetch(`/menu-dia/fecha?${query}`);
+}
+
+export async function crearMenuDia({
+  fecha,
+  descripcion,
+  publicado,
+  id_usuario,
+  stock_total,
+}) {
+  return await apiFetch(`/menu-dia/crear-menu`, {
+    method: "POST",
+    body: { fecha, descripcion, publicado, id_usuario, stock_total },
+  });
+}
+
+export async function actualizarMenuDia({
+  id,
+  fecha,
+  descripcion,
+  stock_total,
+}) {
+  return await apiFetch(`/menu-dia/actualizar-menu`, {
+    method: "PUT",
+    body: { id, fecha, descripcion, stock_total },
+  });
+}
+
+export async function cambiarEstadoMenuDia(idMenuDia) {
+  return await apiFetch(`/menu-dia/cambiar-estado/${idMenuDia}`, {
+    method: "PATCH",
+  });
+}
+
+export async function getMenusDiaPorSemana(fechaReferenciaISO, offset = 1) {
+  const query = new URLSearchParams({
+    fechaReferencia: fechaReferenciaISO,
+    offset: String(offset),
+  }).toString();
+
+  return await apiFetch(`/menu-dia/semana?${query}`);
+}
+
+// =======================
+//       MENU-PLATO
+// =======================
+
+// Obtener menÃƒÂº-platos por fecha (MenuPlato)
+export async function getMenuPlatosPorFecha(fechaISO) {
+  return await apiFetch(
+    `/menu-plato/fecha?fecha=${encodeURIComponent(fechaISO)}`
+  );
+}
+
+export async function agregarPlatoAlMenu({ idMenuDia, idPlato, stockInicial }) {
+  return await apiFetch("/menu-plato/plato", {
+    method: "POST",
+    body: { idMenuDia, idPlato, stockInicial },
+  });
+}
+
+export async function eliminarPlatoDelMenu(idMenuPlato) {
+  return await apiFetch(`/menu-plato/plato/${idMenuPlato}`, {
+    method: "DELETE",
+  });
+}
+
+// =======================
+//         PEDIDOS
+// =======================
+
+export async function getPedidosPorUsuario(idUsuario) {
+  return await apiFetch(`/pedidos/usuario/${idUsuario}`);
+}
+
+export async function crearPedido({
+  idUsuario,
+  fecha_pedido,
+  cantidad_personas = 1,
+  estado = "Pendiente",
+}) {
+  const dto = {
+    // El DTO CrearPedidoDTO en el servicio usa getUsuario(),
+    // asÃƒÂ­ que acÃƒÂ¡ le mandamos un objeto Usuario mÃƒÂ­nimo con idUsuario
+    usuario: { idUsuario },
+    fecha_pedido, // LocalDate en el back Ã¢â€ â€™ "YYYY-MM-DD" en JSON
+    cantidad_personas, // int
+    estado, // "Pendiente" / "Confirmado" / "Cancelado"
+  };
+
+  return await apiFetch("/pedidos", {
+    method: "POST",
+    body: dto,
+  });
+}
+
+export async function confirmarPedido({
+  idUsuario,
+  idMenuPlato,
+  cantidadPersonas,
+  fechaEntrega,
+}) {
+  return await apiFetch(`/pedidos/confirmar`, {
+    method: "POST",
+    body: { idUsuario, idMenuPlato, cantidadPersonas, fechaEntrega },
+  });
+}
+
+// Confirmar toda la semana desde el restaurante
+export async function confirmarSemanaPedidos(fechaReferencia, offset = 0) {
+  const query = new URLSearchParams({
+    fechaReferencia,
+    offset: String(offset),
+  }).toString();
+
+  return await apiFetch(`/pedidos/confirmar-semana?${query}`, {
+    method: "PATCH",
+  });
 }
 
 
-// --- Ejemplo de función combinada ---
-// Devuelve toda la información “del sistema” de una sola vez
-export async function getSistemaCompleto() {
-  const [usuarios, platos, config] = await Promise.all([
-    getUsuarios(),
-    getPlatos(),
-    getConfig(),
-    getPedidos()
-  ]);
+// =======================
+//        PEDIDO-DIA
+// =======================
 
-  return { usuarios, platos, config };
+export async function crearPedidoDia(body) {
+  return await apiFetch(`/pedido-dia`, {
+    method: "POST",
+    body,
+  });
 }
+
+export async function getPorPedido(idPedido) {
+  return await apiFetch(`/pedido-dia/pedido/${idPedido}`);
+}
+
+export async function actualizarPedidoDia(body) {
+  return await apiFetch(`/pedido-dia`, {
+    method: "PUT",
+    body,
+  });
+}
+
+export async function eliminarPedidoDia(idPedidoDia) {
+  if (idPedidoDia === undefined || idPedidoDia === null) {
+    throw new Error("eliminarPedidoDia: idPedidoDia es undefined/null");
+  }
+
+  const idNumero = Number(idPedidoDia);
+  if (!Number.isInteger(idNumero)) {
+    throw new Error(`eliminarPedidoDia: idPedidoDia invÃƒÂ¡lido (${idPedidoDia})`);
+  }
+
+  return await apiFetch(`/pedido-dia/${idNumero}`, {
+    method: "DELETE",
+  });
+}
+
+export async function getPedidosSemana(fechaReferenciaISO, offset = 0) {
+  const query = new URLSearchParams({
+    fechaReferencia: fechaReferenciaISO,
+    offset: String(offset),
+  }).toString();
+
+  try {
+    return await apiFetch(`/pedido-dia/semana?${query}`);
+  } catch (err) {
+    const mensaje = String(err?.message || "");
+    if (
+      mensaje.includes("No hay pedidos para esa semana") ||
+      mensaje.includes("No hay pedidos para esa semana") ||
+      mensaje.includes("Error 404")
+    ) {
+      return []; // semana sin pedidos = lista vaci­a
+    }
+    throw err;
+  }
+}
+
+// =======================
+//      NOTIFICACIONES
+// =======================
+
+export async function getNotificacionesPorUsuario(idUsuario) {
+  return await apiFetch(`/notificaciones/usuario/${idUsuario}`);
+}
+
+// Marcar una notificacion como leida
+export async function marcarNotificacionLeida(idNotificacion) {
+  return await apiFetch(`/notificaciones/${idNotificacion}/marcar-leida`, {
+    method: "PATCH",
+  });
+}
+
+// Marcar todas las notificaciones de un usuario como leidas
+export async function marcarTodasNotificacionesLeidas(idUsuario) {
+  return await apiFetch(`/notificaciones/usuario/${idUsuario}/marcar-todas-leidas`, {
+    method: "PATCH",
+  });
+}
+// =======================
+//      AUTENTICACION
+// =======================
 
 export function getUsuarioActivo() {
-  const raw = localStorage.getItem('usuarioActivo') || sessionStorage.getItem('usuarioActivo');
+  const raw =
+    localStorage.getItem("usuarioActivo") ||
+    sessionStorage.getItem("usuarioActivo");
   return raw ? JSON.parse(raw) : null;
 }
 
-export function requireAuth(loginUrl = './login.html') {
+export function requireAuth(loginUrl = "./login.html") {
   const user = getUsuarioActivo();
-  if (!user) { window.location.replace(loginUrl); return null; }
+  if (!user) {
+    window.location.replace(loginUrl);
+    return null;
+  }
   return user;
 }
 
-export function logout(loginUrl = './login.html') {
-  localStorage.removeItem('usuarioActivo');
-  sessionStorage.removeItem('usuarioActivo');
+export function logout(loginUrl = "./login.html") {
+  localStorage.removeItem("usuarioActivo");
+  sessionStorage.removeItem("usuarioActivo");
   window.location.replace(loginUrl);
 }
 
-export function requireAdmin(redirectUrl = './index.html') {
-  const user = requireAuth('./login.html'); // asegura que esté logueado
+export function requireAdmin(redirectUrl = "./index.html") {
+  const user = requireAuth("./login.html"); // asegura que estÃƒÂ© logueado
   if (!user) return null;
-  if (user.rol !== 'administrador') {
+
+  // Ajustar segÃƒÂºn lo que devuelva tu API: 'es_usuario_restaurante' o similar.
+  const esAdminRestaurante = user.es_usuario_restaurante === true;
+
+  if (!esAdminRestaurante) {
     window.location.href = redirectUrl;
     return null;
   }
   return user;
+}
+
+// =======================
+//      CONFIGURACION
+// =======================
+
+export async function getConfiguracion() {
+  return await apiFetch("/configuracion");
+}
+
+export async function actualizarHorarioLimite(horarioLimite) {
+  const query = new URLSearchParams({ horarioLimite }).toString();
+  return await apiFetch(`/configuracion/horario-limite?${query}`, {
+    method: "PATCH",
+  });
+}
+
+export async function actualizarFeriados(feriados) {
+  return await apiFetch("/configuracion/feriados", {
+    method: "PUT",
+    body: feriados,
+  });
 }

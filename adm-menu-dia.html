@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Administrar menús del día</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="./css/styles.css" />
+    <link rel="stylesheet" href="./css/adm-menu.css" />
+    <link rel="stylesheet" href="css/body.css">
+    <link rel="stylesheet" href="css/sidebar/sidebar.css">
+    <link rel="stylesheet" href="css/navbar/navbar.css">
+    <link rel="stylesheet" href="css/navbar/navbar_div.css">
+    <link rel="stylesheet" href="css/navbar/navbar_div_icono.css">
+    <link rel="stylesheet" href="css/navbar/navbar_btn_logout.css">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css">
+</head>
+
+<body>
+
+    <header>
+        <nav class="navbar">
+            <div class="navbar_div">
+                <img src="resources/restaurant.png" alt="plato de comida" class="navbar_div_icono" />
+                <p>Sistema de gestion de Pedidos</p>
+            </div>
+            <div class="navbar_div">
+                <img src="resources/usuario.png" alt="icono de usuario" class="navbar_div_icono" />
+                <p id="nombre-usuario-header"></p>
+                <button id="btn-logout" class="navbar_btn_logout"> Cerrar Sesion </button>
+            </div>
+        </nav>
+    </header>
+
+    <div class="body">
+        <aside class="sidebar">
+            <ul class="sidebar_lista">
+                <!-- El contenido se genera dinámicamente desde sidebar.js -->
+            </ul>
+        </aside>
+
+        <section class="adm_menu_main " style=" padding: 1rem; margin-left: 23rem; flex:1; width: 100%;">
+            <h1>ADMINISTRAR MENUS DEL DIA</h1>
+
+            <div class="adm_menu_card">
+                <div class="adm_menu_row">
+                    <label><b>Fecha</b></label>
+                    <input id="fecha" type="date" />
+                    <button id="btn-buscar" class="adm-menu-btn-buscar">Buscar</button>
+                </div>
+
+                <p id="msg" style="opacity:.85; margin:10px 0 0 0;"></p>
+            </div>
+
+            <div id="bloque-menu" class="adm_menu_card" style="display:none;">
+                <h3 style="margin-top:0;">Menú del día</h3>
+
+                <div class="adm_menu_row2">
+                    <label>Descripción</label>
+                    <input id="descripcion" type="text" placeholder="Ej: Menú martes" />
+                </div>
+
+                <div class="adm_menu_row2">
+                    <label>Stock total</label>
+                    <input id="stockTotal" type="number" min="0" />
+                </div>
+
+                <div class="adm_menu_row2">
+                    <label>Publicado</label>
+                    <select id="publicado">
+                        <option value="true">Sí</option>
+                        <option value="false">No</option>
+                    </select>
+                </div>
+
+                <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:12px;">
+                    <button id="btn-guardar-menu">Guardar cambios</button>
+                </div>
+            </div>
+
+            <div id="bloque-platos" class="adm_menu_card" style="display:none;">
+                <h3 style="margin-top:0;">Platos del menú</h3>
+
+                <div class="adm_menu_row">
+                    <select id="select-plato" style="flex:1;"></select>
+                    <input id="stockPlato" type="number" min="0" placeholder="Stock" style="width:120px;" />
+                    <button id="btn-agregar-plato">Agregar</button>
+                </div>
+
+                <div id="lista-platos" style="margin-top:12px;"></div>
+            </div>
+        </section>
+    </div>
+
+    <script type="module" src="/js/adm-menu-dia.js"></script>
+    <script type="module" src="/js/header.js"></script>
+    <script type="module" src="/js/sidebar.js"></script>
+</body>
+
+</html>

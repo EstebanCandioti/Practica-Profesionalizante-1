@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="css/navbar/navbar.css" />
   <link rel="stylesheet" href="css/navbar/navbar_div.css" />
   <link rel="stylesheet" href="css/navbar/navbar_div_icono.css" />
+  <link rel="stylesheet" href="css/navbar/navbar_btn_logout.css">
   <link rel="stylesheet" href="css/sidebar/sidebar.css" />
   <!--Clase sidebar w3School-->
   <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css" />
@@ -19,7 +20,6 @@
   <link rel="stylesheet" href="css/home/home_cartas_carta_titulo.css" />
   <link rel="stylesheet" href="css/body.css" />
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-  <script src="script.js"></script>
 </head>
 
 <body>
@@ -32,6 +32,7 @@
       <div class="navbar_div">
         <img src="resources/usuario.png" alt="icono de usuario" class="navbar_div_icono" />
         <p id="nombre-usuario-header"></p>
+        <button id="btn-logout" class="navbar_btn_logout"> Cerrar Sesion </button>
       </div>
     </nav>
   </header>
@@ -39,42 +40,7 @@
     <!-- Sidebar -->
     <aside class="sidebar">
       <ul class="sidebar_lista">
-        <li class="sidebar_lista_item">
-          <img src="/resources/casa.png" alt="" class="sidebar_lista_item_icono">
-          <div class="sidebar_esconder">
-            <button class="sidebar_esconder_boton"><a href="/index.html"
-                class="sidebar_esconder_boton_link">Home</a></button>
-          </div>
-        </li>
-        <li class="sidebar_lista_item">
-          <img src="/resources/pedido.png" alt="" class="sidebar_lista_item_icono">
-          <div class="sidebar_esconder">
-            <button class="sidebar_esconder_boton"><a href="realizar_pedido.html"
-                class="sidebar_esconder_boton_link">Realizar pedido</a></button>
-          </div>
-        </li>
-        <li class="sidebar_lista_item">
-          <img src="/resources/asistencia.png" alt="" class="sidebar_lista_item_icono">
-          <div class="sidebar_esconder">
-            <button class="sidebar_esconder_boton"><a href="configurar_asistencia.html"
-                class="sidebar_esconder_boton_link">Configurar asistencia</a></button>
-          </div>
-        </li>
-        <li class="sidebar_lista_item">
-          <img src="/resources/notificacion.png" alt="" class="sidebar_lista_item_icono">
-          <div class="sidebar_esconder">
-            <button class="sidebar_esconder_boton"><a href="#" class="sidebar_esconder_boton_link">Ver
-                notificaciones</a></button>
-          </div>
-        </li>
-        <li class="sidebar_lista_item">
-          <img src="/resources/configuracion.png" alt="" class="sidebar_lista_item_icono" />
-          <div class="sidebar_esconder">
-            <button class="sidebar_esconder_boton">
-              <a href="adm-configuracion.html" class="sidebar_esconder_boton_link">Configuracion</a>
-            </button>
-          </div>
-        </li>
+        <!-- El contenido se genera dinámicamente desde sidebar.js -->
       </ul>
     </aside>
     <section class="home_cartas">
@@ -108,6 +74,7 @@
   </div>
   <script type="module" src="/js/index.js"></script>
   <script type="module" src="/js/header.js"></script>
+  <script type="module" src="/js/sidebar.js"></script>
 
 </body>
 

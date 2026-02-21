@@ -3,3 +3,8 @@
     border: none;
     cursor: pointer;
 }
+
+.realizar_pedido_container_dias_dia:hover{
+    background-color: rgb(138, 138, 138);
+    transition: 0.5s;
+}

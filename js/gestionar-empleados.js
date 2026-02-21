@@ -1,75 +1,109 @@
-import { requireAdmin, getUsuarios } from "./servicio.js";
+import { requireAdmin, getUsuarios, cambiarEstadoUsuario } from "./servicio.js";
+
+// Agrega la función al servicio si aún no existe — ver nota al final del archivo
+// Endpoint real: PUT /usuarios/estado/{id}
+
+function etiquetaRol(esRestaurante) {
+  return esRestaurante ? "Restaurante" : "Empleado";
+}
 
 function crearItemUsuario(u) {
   const li = document.createElement("li");
   li.className = "gestion_empleados_main_menu_lista_item";
-  li.dataset.id = u.id;
+  li.dataset.id = u.idUsuario;
+  li.dataset.activo = u.activo ? "true" : "false";
+
+  const nombreCompleto = [u.nombre, u.apellido].filter(Boolean).join(" ") || "Sin nombre";
+  const rol = etiquetaRol(u.es_usuario_restaurante);
+  const estadoTexto = u.activo ? "Activo" : "Inactivo";
+  const btnTexto = u.activo ? "Desactivar" : "Activar";
+  const btnClase = u.activo ? "ge_toggle ge_toggle--desactivar" : "ge_toggle ge_toggle--activar";
 
   li.innerHTML = `
-    <span class="ge_nombre">${u.nombre || u.username || "Sin nombre"}</span>
-    <span class="ge_rol">(${u.rol})</span>
-    <button type="button" class="ge_toggle">${u.rol === "administrador" ? "Quitar admin" : "Hacer admin"}</button>
-    <button type="button" class="ge_borrar">Eliminar</button>
+    <span class="ge_nombre">${nombreCompleto}</span>
+    <span class="ge_rol">(${rol})</span>
+    <span class="ge_estado ${u.activo ? "ge_estado--activo" : "ge_estado--inactivo"}">${estadoTexto}</span>
+    <button type="button" class="${btnClase}">${btnTexto}</button>
   `;
   return li;
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
-  // 1) Solo admin
-  const admin = requireAdmin("./index.html");
-  if (!admin) return;
+  // Solo el usuario restaurante puede acceder a esta pantalla
+  const adminActivo = requireAdmin("./index.html");
+  if (!adminActivo) return;
 
-  // 2) Referencias
   const ul = document.querySelector(".gestion_empleados_main_menu_lista");
-  const btnAplicar = document.querySelector(".gestion_empleados_main_boton");
-  if (!ul || !btnAplicar) return;
+  if (!ul) return;
 
-  // 3) Cargar usuarios y render
-  const usuarios = await getUsuarios();
+  // Cargar y renderizar empleados (excluye al usuario restaurante logueado)
+  let usuarios = [];
+  try {
+    const todos = await getUsuarios();
+    // Mostrar solo empleados (no restaurante), excluyendo al admin actual
+    usuarios = todos.filter(
+      (u) => !u.es_usuario_restaurante && u.idUsuario !== adminActivo.idUsuario
+    );
+  } catch (err) {
+    ul.innerHTML = `<li style="padding:1rem;color:red;">Error al cargar empleados: ${err.message}</li>`;
+    return;
+  }
+
+  if (usuarios.length === 0) {
+    ul.innerHTML = `<li style="padding:1rem;color:#555;">No hay empleados registrados.</li>`;
+    return;
+  }
+
   ul.innerHTML = "";
-  usuarios.forEach(u => ul.appendChild(crearItemUsuario(u)));
+  usuarios.forEach((u) => ul.appendChild(crearItemUsuario(u)));
 
-  // Estructuras para recolectar cambios (solo UI)
-  const cambiosRol = new Map();   // id -> "usuario" | "administrador"
-  const eliminados = new Set();   // ids eliminados
+  // Delegación de eventos: toggle activo/inactivo por empleado
+  ul.addEventListener("click", async (e) => {
+    if (!e.target.classList.contains("ge_toggle")) return;
 
-  // 4) Delegación de acciones
-  ul.addEventListener("click", (e) => {
     const li = e.target.closest(".gestion_empleados_main_menu_lista_item");
     if (!li) return;
+
     const id = Number(li.dataset.id);
-    const spanRol = li.querySelector(".ge_rol");
-    const btnToggle = li.querySelector(".ge_toggle");
+    const estaActivo = li.dataset.activo === "true";
+    const accion = estaActivo ? "desactivar" : "activar";
 
-    // Toggle rol
-    if (e.target.classList.contains("ge_toggle")) {
-      const rolActual = spanRol.textContent.replace(/[()]/g, "").trim(); // "(usuario)" -> "usuario"
-      const nuevoRol = rolActual === "administrador" ? "usuario" : "administrador";
+    const confirmar = confirm(
+      `¿Querés ${accion} este empleado?`
+    );
+    if (!confirmar) return;
 
-      spanRol.textContent = `(${nuevoRol})`;
-      btnToggle.textContent = nuevoRol === "administrador" ? "Quitar admin" : "Hacer admin";
-      cambiosRol.set(id, nuevoRol);
+    e.target.disabled = true;
+    e.target.textContent = "Guardando...";
+
+    try {
+      await cambiarEstadoUsuario(id);
+
+      // Actualizar UI sin recargar la página
+      const nuevoActivo = !estaActivo;
+      li.dataset.activo = nuevoActivo ? "true" : "false";
+
+      const spanEstado = li.querySelector(".ge_estado");
+      spanEstado.textContent = nuevoActivo ? "Activo" : "Inactivo";
+      spanEstado.className = `ge_estado ${nuevoActivo ? "ge_estado--activo" : "ge_estado--inactivo"}`;
+
+      e.target.textContent = nuevoActivo ? "Desactivar" : "Activar";
+      e.target.className = `ge_toggle ${nuevoActivo ? "ge_toggle--desactivar" : "ge_toggle--activar"}`;
+    } catch (err) {
+      alert(`No se pudo ${accion} el empleado: ${err.message}`);
+      e.target.textContent = estaActivo ? "Desactivar" : "Activar";
+    } finally {
+      e.target.disabled = false;
     }
-
-    // Eliminar
-    if (e.target.classList.contains("ge_borrar")) {
-      if (id === admin.id) {
-        alert("No podés eliminar tu propio usuario.");
-        return;
-      }
-      li.remove();
-      eliminados.add(id);
-      cambiosRol.delete(id); // si tenía cambio de rol, ya no aplica
-    }
-  });
-
-  // 5) Aplicar cambios (consola)
-  btnAplicar.addEventListener("click", () => {
-    const payloadCambios = Array.from(cambiosRol.entries()).map(([usuario_id, nuevo_rol]) => ({ usuario_id, nuevo_rol }));
-    const payloadBajas = Array.from(eliminados.values()).map(usuario_id => ({ usuario_id }));
-
-    console.log("Cambios de rol:", payloadCambios);
-    console.log("Eliminados:", payloadBajas);
-    alert("Cambios listos (ver consola).");
   });
 });
+
+/*
+  NOTA — Agregar en servicio.js si no existe:
+
+  export async function cambiarEstadoUsuario(idUsuario) {
+    return await apiFetch(`/usuarios/estado/${idUsuario}`, {
+      method: "PUT",
+    });
+  }
+*/

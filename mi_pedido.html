@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+  <meta charset="utf-8" />
+  <title>Mis pedidos pendientes</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="css/sidebar/sidebar.css">
+  <link rel="stylesheet" href="css/navbar/navbar.css">
+  <link rel="stylesheet" href="css/navbar/navbar_div.css">
+  <link rel="stylesheet" href="css/navbar/navbar_div_icono.css">
+  <link rel="stylesheet" href="css/navbar/navbar_btn_logout.css">
+  <link rel="stylesheet" href="css/body.css">
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css">
+  <link rel="stylesheet" href="css/mi_pedido/mi_pedido_boton.css">
+  <link rel="stylesheet" href="css/mi_pedido/mi_pedido_boton_modal.css">
+  <link rel="stylesheet" href="css/mi_pedido/mi_pedido_cartas.css">
+  <link rel="stylesheet" href="css/mi_pedido/mi_pedido_cartas_carta.css">
+</head>
+
+<body>
+  <header>
+    <nav class="navbar">
+      <div class="navbar_div">
+        <img src="resources/restaurant.png" alt="plato de comida" class="navbar_div_icono" />
+        <p>Sistema de gestion de Pedidos</p>
+      </div>
+      <div class="navbar_div">
+        <img src="resources/usuario.png" alt="icono de usuario" class="navbar_div_icono" />
+        <p id="nombre-usuario-header"></p>
+        <button id="btn-logout" class="navbar_btn_logout"> Cerrar Sesion </button>
+      </div>
+    </nav>
+  </header>
+
+  <div class="body">
+    <aside class="sidebar">
+      <ul class="sidebar_lista">
+        <!-- El contenido se genera dinámicamente desde sidebar.js -->
+      </ul>
+    </aside>
+    <section class="w3-container container-fluid" style="padding: 18px; flex: 1;">
+      <h1 style="margin-bottom: 12px; text-align: center;">Mis pedidos pendientes</h1>
+
+      <div id="estado" style="margin-bottom: 12px; opacity: .85;"></div>
+
+      <div id="lista-pedidos" class="mi_pedido_cartas"></div>
+
+      <!-- Plantilla: 1 pedido -->
+      <template id="tpl-pedido">
+        <div class="mi_pedido_cartas_carta pedido-item">
+          <p><b>Entrega:</b> <span data-field="fechaEntrega">—</span></p>
+          <p><b>Plato:</b> <span data-field="nombrePlato">—</span></p>
+          <p><b>Cantidad:</b> <span data-field="cantidadPersonas">—</span></p>
+          <p><b>Estado:</b> <span data-field="estado">—</span></p>
+
+          <!-- Botones ya definidos en HTML -->
+          <button class="mi_pedido_boton" data-action="modificar">Modificar</button>
+          <button class="mi_pedido_boton" data-action="cancelar">Cancelar</button>
+        </div>
+      </template>
+    </section>
+  </div>
+
+  <!-- Modal editar pedido -->
+  <div id="modal-editar" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:9999;">
+    <div style="max-width:520px; margin:8vh auto; background:#fff; padding:16px; border-radius:10px;">
+      <h3 style="margin-top:0;">Modificar pedido</h3>
+
+      <div style="margin-bottom:10px;">
+        <label><b>Plato</b></label><br />
+        <select id="select-plato" style="width:100%; padding:8px;"></select>
+        <small id="stock-info" style="display:block; margin-top:6px; opacity:.8;"></small>
+      </div>
+
+      <div style="margin-bottom:10px;">
+        <label><b>Cantidad de personas</b></label><br />
+        <input id="input-cantidad" type="number" min="1" style="width:100%; padding:8px;" />
+      </div>
+
+      <p id="modal-msg" style="min-height:18px; color:#b00020;"></p>
+
+      <div style="display:flex; gap:10px; justify-content:flex-end;">
+        <button id="btn-cancelar" type="button" class="mi_pedido_boton">Cancelar</button>
+        <button id="btn-guardar" type="button" class="mi_pedido_boton">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+
+  <script type="module" src="/js/mi_pedido.js"></script>
+  <script type="module" src="/js/header.js"></script>
+  <script type="module" src="/js/sidebar.js"></script>
+</body>
+
+</html>

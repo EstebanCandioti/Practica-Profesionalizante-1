@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="css/navbar/navbar.css">
   <link rel="stylesheet" href="css/navbar/navbar_div.css">
   <link rel="stylesheet" href="css/navbar/navbar_div_icono.css">
+  <link rel="stylesheet" href="css/navbar/navbar_btn_logout.css">
   <link rel="stylesheet" href="/css/sidebar/sidebar.css">
   <link rel="stylesheet" href="css/configurar asistencia/configurar_asistencia_main.css">
   <link rel="stylesheet" href="css/configurar asistencia/configurar_asistencia_titulo.css">
@@ -19,6 +20,99 @@
   <link rel="stylesheet" href="css/configurar asistencia/configurar_asistencia_boton.css">
   <link rel="stylesheet" href="/css/configurar asistencia/configurar_asistencia_checkbox.css">
   <link rel="stylesheet" href="css/body.css">
+  <style>
+    /* Estilos del modal de confirmacion */
+    .asistencia_modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 9999;
+      display: none; /* Usar display none en vez de hidden */
+      align-items: center;
+      justify-content: center;
+    }
+
+    .asistencia_modal.show {
+      display: flex; /* Cuando tenga clase show, mostrar como flex */
+    }
+
+    .asistencia_modal_backdrop {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .asistencia_modal_dialog {
+      position: relative;
+      background: white;
+      border-radius: 8px;
+      padding: 24px;
+      max-width: 400px;
+      width: 90%;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .asistencia_modal_header {
+      margin-bottom: 16px;
+    }
+
+    .asistencia_modal_titulo {
+      margin: 0;
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+
+    .asistencia_modal_titulo--exito {
+      color: #28a745;
+    }
+
+    .asistencia_modal_titulo--error {
+      color: #dc3545;
+    }
+
+    .asistencia_modal_mensaje {
+      margin: 0 0 24px 0;
+      color: #333;
+      line-height: 1.5;
+    }
+
+    .asistencia_modal_footer {
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .asistencia_modal_btn {
+      padding: 10px 24px;
+      border: none;
+      border-radius: 4px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .asistencia_modal_btn--exito {
+      background-color: #28a745;
+      color: white;
+    }
+
+    .asistencia_modal_btn--exito:hover {
+      background-color: #218838;
+    }
+
+    .asistencia_modal_btn--error {
+      background-color: #dc3545;
+      color: white;
+    }
+
+    .asistencia_modal_btn--error:hover {
+      background-color: #c82333;
+    }
+  </style>
 </head>
 
 <body>
@@ -27,12 +121,13 @@
   <header>
     <nav class="navbar">
       <div class="navbar_div">
-        <img src="resources/restaurant.png" alt="plato de comida" class="navbar_div_icono">
+        <img src="resources/restaurant.png" alt="plato de comida" class="navbar_div_icono" />
         <p>Sistema de gestion de Pedidos</p>
       </div>
       <div class="navbar_div">
-        <img src="resources/usuario.png" alt="icono de usuario" class="navbar_div_icono">
+        <img src="resources/usuario.png" alt="icono de usuario" class="navbar_div_icono" />
         <p id="nombre-usuario-header"></p>
+        <button id="btn-logout" class="navbar_btn_logout"> Cerrar Sesion </button>
       </div>
     </nav>
   </header>
@@ -96,7 +191,7 @@
 
       <div class="configurar_asistencia_dia">
         <span class="configurar_asistencia_dia_span">
-          <div class="configurar_asistencia_span_circle"></div>Miércoles
+          <div class="configurar_asistencia_span_circle"></div>Miercoles
         </span>
         <input type="checkbox" checked class="configurar_asistencia_checkbox">
       </div>
@@ -118,8 +213,23 @@
       <button class="configurar_asistencia_boton">Guardar</button>
     </section>
   </div>
+
+  <!-- Modal de confirmacion - SIN hidden, usa display:none en CSS -->
+  <div class="asistencia_modal" id="asistencia_modal">
+    <div class="asistencia_modal_backdrop"></div>
+    <div class="asistencia_modal_dialog" role="dialog" aria-modal="true">
+      <header class="asistencia_modal_header">
+        <h2 class="asistencia_modal_titulo" id="asistencia_modal_titulo">Titulo</h2>
+      </header>
+      <p class="asistencia_modal_mensaje" id="asistencia_modal_mensaje">Mensaje</p>
+      <footer class="asistencia_modal_footer">
+        <button class="asistencia_modal_btn" id="asistencia_modal_btn">Aceptar</button>
+      </footer>
+    </div>
+  </div>
+
   <script type="module" src="./js/configurar_asistencia.js"></script>
-   <script type="module" src="/js/header.js"></script>
+  <script type="module" src="/js/header.js"></script>
 </body>
 
 </html>

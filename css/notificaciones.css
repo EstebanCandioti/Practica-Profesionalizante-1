@@ -1,0 +1,38 @@
+.notificaciones_lista{
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 1000px;
+}
+
+.noti_card{
+  background: #fff;
+  border-radius: 10px;
+  padding: 14px 16px;
+  box-shadow: 0 2px 6px rgba(0,0,0,.1);
+}
+
+.noti_head{
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: baseline;
+}
+
+.noti_asunto{
+  margin: 0;
+  font-size: 16px;
+}
+
+.noti_fecha{
+  opacity: .75;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.noti_mensaje{
+  margin: 10px 0 0 0;
+  opacity: .9;
+  line-height: 1.35;
+  white-space: pre-wrap;
+}

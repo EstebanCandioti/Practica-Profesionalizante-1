@@ -1,67 +1,73 @@
-import { requireAuth, getConfig } from "./servicio.js";
-
-document.addEventListener('DOMContentLoaded', async () => {
-  const usuario = requireAuth("./login.html");
-  if (!usuario) return;
-
-  const config = await getConfig();
-  const form = document.getElementById('horario_limite_form');
-  const inputHora = form?.elements['cutoff'];
-
-  if (inputHora && config?.horario_limite_pedidos) {
-    inputHora.value = config.horario_limite_pedidos; // precarga desde config.json
-  }
-});
-
+import { requireAdmin, getConfiguracion, actualizarHorarioLimite } from "./servicio.js";
 
 const modal = document.getElementById("horario_limite_modal");
 const openBtn = document.querySelector("#horario-limite");
 const form = document.getElementById("horario_limite_form");
+const inputHora = form?.elements["cutoff"];
 
-function open() {
+
+// ── Abrir / cerrar modal ──────────────────────────────────────────────────────
+
+function abrirModal() {
   modal.hidden = false;
   trapFocus();
 }
-function close() {
+
+function cerrarModal() {
   modal.hidden = true;
-  document.activeElement.blur();
+  document.activeElement?.blur();
 }
 
-// e indica el evento que se esta recibiendo al hacer click o tocar una tecla
 document.addEventListener("click", (e) => {
-  if (e.target === openBtn) open();
-  if (e.target.hasAttribute("data-close")) close();
-});
-document.addEventListener("keydown", (e) => {
-  if (!modal.hidden && e.key === "Escape") close();
+  if (e.target === openBtn) abrirModal();
+  if (e.target.hasAttribute("data-close")) cerrarModal();
 });
 
-// Validación: exigir HH:MM con rangos válidos (00–23 : 00–59)
-form.addEventListener('submit', (e) => {
-  const time = form.elements['cutoff'].value || '';
+document.addEventListener("keydown", (e) => {
+  if (!modal.hidden && e.key === "Escape") cerrarModal();
+});
+
+// Accesibilidad: foco dentro del modal
+function trapFocus() {
+  const focusables = modal.querySelectorAll("button, [href], input, select");
+  if (focusables.length) focusables[0].focus();
+}
+
+// ── Inicialización ────────────────────────────────────────────────────────────
+
+document.addEventListener("DOMContentLoaded", async () => {
+  const admin = requireAdmin("./index.html");
+  if (!admin) return;
+
+  // Precargar el horario actual desde el backend
+  try {
+    const config = await getConfiguracion();
+    if (inputHora && config?.horarioLimite) {
+      inputHora.value = config.horarioLimite;
+    }
+  } catch (err) {
+    console.error("No se pudo cargar la configuración:", err);
+  }
+});
+
+// ── Guardar horario ───────────────────────────────────────────────────────────
+
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const time = inputHora?.value || "";
   const formatoValido = /^(?:[01]\d|2[0-3]):[0-5]\d$/.test(time);
 
   if (!formatoValido) {
-    e.preventDefault();
-    alert('Ingresá un horario válido (HH:MM, 00–23 : 00–59).');
+    alert("Ingresá un horario válido (HH:MM, 00–23 : 00–59).");
     return;
   }
 
-  // Sin persistencia (solo UI por ahora)
-  e.preventDefault();
-  alert(`Horario límite actualizado a ${time}.`);
-
-  const modal = document.getElementById('horario_limite_modal');
-  modal.hidden = true;
-  document.activeElement?.blur();
-});
-
-
-// Accesibilidad básica: foco dentro del modal
-function trapFocus() {
-  const focusables = modal.querySelectorAll("button, [href], input, select");
-  if (focusables.length) {
-    focusables[0].focus();
+  try {
+    await actualizarHorarioLimite(time);
+    alert(`Horario límite actualizado a ${time}.`);
+    cerrarModal();
+  } catch (err) {
+    alert("Error al guardar el horario: " + err.message);
   }
-}
-
+});

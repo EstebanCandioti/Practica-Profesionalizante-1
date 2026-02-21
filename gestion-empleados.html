@@ -8,6 +8,7 @@
   <link rel="stylesheet" type="text/css" href="css/navbar/navbar.css" />
   <link rel="stylesheet" href="css/navbar/navbar_div.css" />
   <link rel="stylesheet" href="css/navbar/navbar_div_icono.css" />
+  <link rel="stylesheet" href="css/navbar/navbar_btn_logout.css">
   <link rel="stylesheet" href="css/sidebar/sidebar.css" />
   <link rel="stylesheet" href="css/body.css">
   <link rel="stylesheet" href="/css/gestion-empleados/gestion_empleados_main.css">
@@ -21,72 +22,38 @@
   <header>
     <nav class="navbar">
       <div class="navbar_div">
-        <img src="resources/restaurant.png" alt="plato de comida" class="navbar_div_icono">
+        <img src="resources/restaurant.png" alt="plato de comida" class="navbar_div_icono" />
         <p>Sistema de gestion de Pedidos</p>
       </div>
       <div class="navbar_div">
-        <img src="resources/usuario.png" alt="icono de usuario" class="navbar_div_icono">
+        <img src="resources/usuario.png" alt="icono de usuario" class="navbar_div_icono" />
         <p id="nombre-usuario-header"></p>
+        <button id="btn-logout" class="navbar_btn_logout">Cerrar Sesion</button>
       </div>
     </nav>
   </header>
+
   <div class="body">
+    <!-- Sidebar del usuario restaurante (admin) -->
     <aside class="sidebar">
       <ul class="sidebar_lista">
-        <li class="sidebar_lista_item">
-          <img src="/resources/casa.png" alt="" class="sidebar_lista_item_icono">
-          <div class="sidebar_esconder">
-            <button class="sidebar_esconder_boton"><a href="/index.html"
-                class="sidebar_esconder_boton_link">Home</a></button>
-          </div>
-        </li>
-        <li class="sidebar_lista_item">
-          <img src="/resources/pedido.png" alt="" class="sidebar_lista_item_icono">
-          <div class="sidebar_esconder">
-            <button class="sidebar_esconder_boton"><a href="realizar_pedido.html"
-                class="sidebar_esconder_boton_link">Realizar pedido</a></button>
-          </div>
-        </li>
-        <li class="sidebar_lista_item">
-          <img src="/resources/asistencia.png" alt="" class="sidebar_lista_item_icono">
-          <div class="sidebar_esconder">
-            <button class="sidebar_esconder_boton"><a href="configurar_asistencia.html"
-                class="sidebar_esconder_boton_link">Configurar asistencia</a></button>
-          </div>
-        </li>
-        <li class="sidebar_lista_item">
-          <img src="/resources/notificacion.png" alt="" class="sidebar_lista_item_icono">
-          <div class="sidebar_esconder">
-            <button class="sidebar_esconder_boton"><a href="#" class="sidebar_esconder_boton_link">Ver
-                notificaciones</a></button>
-          </div>
-        </li>
-        <li class="sidebar_lista_item">
-          <img src="/resources/configuracion.png" alt="" class="sidebar_lista_item_icono">
-          <div class="sidebar_esconder">
-            <button class="sidebar_esconder_boton"><a href="adm-configuracion.html"
-                class="sidebar_esconder_boton_link">Configuracion</a></button>
-          </div>
-        </li>
+        <!-- El contenido se genera dinámicamente desde sidebar.js -->
       </ul>
     </aside>
+
     <section class="gestion_empleados_main">
       <h1 class="gestion_empleados_main_titulo">Gestion de empleados</h1>
       <div class="gestion_empleados_main_menu">
         <ul class="gestion_empleados_main_menu_lista">
-          <li class="gestion_empleados_main_menu_lista_item">Empleado 1</li>
-          <li class="gestion_empleados_main_menu_lista_item">Empleado 2</li>
-          <li class="gestion_empleados_main_menu_lista_item">Empleado 3</li>
-          <li class="gestion_empleados_main_menu_lista_item">Empleado 4</li>
-          <li class="gestion_empleados_main_menu_lista_item">Empleado 5</li>
+          <!-- Los ítems se generan dinámicamente desde gestionar-empleados.js -->
         </ul>
       </div>
-      <button class="gestion_empleados_main_boton">Aplicar Cambios</button>
     </section>
-
   </div>
-   <script type="module" src="/js/header.js"></script>
-   <script type="module" src="/js/gestionar-empleados.js"></script>
+
+  <script type="module" src="/js/header.js"></script>
+  <script type="module" src="/js/gestionar-empleados.js"></script>
+  <script type="module" src="/js/sidebar.js"></script>
 </body>
 
 </html>

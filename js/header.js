@@ -1,4 +1,4 @@
-import { getUsuarioActivo } from "./servicio.js";
+import { getUsuarioActivo, logout } from "./servicio.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   const user = getUsuarioActivo();
@@ -11,4 +11,9 @@ document.addEventListener("DOMContentLoaded", () => {
       headerUser.textContent = "Invitado";
     }
   }
+
+    document.getElementById("btn-logout")?.addEventListener("click", ()=>{
+    const ok= confirm("¿Queres cerrar sesion?")
+    if(ok) logout("./login.html")
+  })
 });

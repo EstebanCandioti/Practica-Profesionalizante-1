@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="css/navbar/navbar.css" />
     <link rel="stylesheet" href="css/navbar/navbar_div.css" />
     <link rel="stylesheet" href="css/navbar/navbar_div_icono.css" />
+    <link rel="stylesheet" href="css/navbar/navbar_btn_logout.css">
     <link rel="stylesheet" href="css/sidebar/sidebar.css" />
     <link rel="stylesheet" href="css/body.css" />
     <link rel="stylesheet" href="css/administrar_platos/administrar_platos_main.css">
@@ -33,63 +34,23 @@
             <div class="navbar_div">
                 <img src="resources/usuario.png" alt="icono de usuario" class="navbar_div_icono" />
                 <p id="nombre-usuario-header"></p>
+                <button id="btn-logout" class="navbar_btn_logout"> Cerrar Sesion </button>
             </div>
         </nav>
     </header>
     <div class="body">
         <aside class="sidebar">
             <ul class="sidebar_lista">
-                <li class="sidebar_lista_item">
-                    <img src="/resources/casa.png" alt="" class="sidebar_lista_item_icono" />
-                    <div class="sidebar_esconder">
-                        <button class="sidebar_esconder_boton">
-                            <a href="/index.html" class="sidebar_esconder_boton_link">Home</a>
-                        </button>
-                    </div>
-                </li>
-                <li class="sidebar_lista_item">
-                    <img src="/resources/pedido.png" alt="" class="sidebar_lista_item_icono" />
-                    <div class="sidebar_esconder">
-                        <button class="sidebar_esconder_boton">
-                            <a href="realizar_pedido.html" class="sidebar_esconder_boton_link">Realizar pedido</a>
-                        </button>
-                    </div>
-                </li>
-                <li class="sidebar_lista_item">
-                    <img src="/resources/asistencia.png" alt="" class="sidebar_lista_item_icono" />
-                    <div class="sidebar_esconder">
-                        <button class="sidebar_esconder_boton">
-                            <a href="configurar_asistencia.html" class="sidebar_esconder_boton_link">Configurar
-                                asistencia</a>
-                        </button>
-                    </div>
-                </li>
-                <li class="sidebar_lista_item">
-                    <img src="/resources/notificacion.png" alt="" class="sidebar_lista_item_icono" />
-                    <div class="sidebar_esconder">
-                        <button class="sidebar_esconder_boton">
-                            <a href="#" class="sidebar_esconder_boton_link">Ver notificaciones</a>
-                        </button>
-                    </div>
-                </li>
-                <li class="sidebar_lista_item">
-                    <img src="/resources/configuracion.png" alt="" class="sidebar_lista_item_icono" />
-                    <div class="sidebar_esconder">
-                        <button class="sidebar_esconder_boton">
-                            <a href="adm-configuracion.html" class="sidebar_esconder_boton_link">Configuracion</a>
-                        </button>
-                    </div>
-                </li>
+                <!-- El contenido se genera dinámicamente desde sidebar.js -->
             </ul>
         </aside>
         <section class="administrar_platos_main">
             <h1 class="administrar_platos_main_titulo">Administrar platos</h1>
             <div class="administrar_platos_main_botones">
                 <button class="administrar_platos_main_botones_boton" id="ap-btn-agregar">Agregar plato</button>
+                <button class="administrar_platos_main_botones_boton" id="ap-btn-editar">Editar plato</button>
                 <button class="administrar_platos_main_botones_boton" id="ap-btn-borrar">Borrar plato</button>
                 <button class="administrar_platos_main_botones_boton">Desmarcar opciones</button>
-                <button class="administrar_platos_main_botones_boton"
-                    id="confirmar_modificacion_platos">Confirmar</button>
             </div>
 
             <section class="administrar_platos_main_platos">
@@ -126,6 +87,9 @@
                 <label class="ap-row">
                     <span>Nombre del plato</span>
                     <input type="text" id="ap-add-nombre" required placeholder="Ej: Pizza napolitana">
+                    <input type="text" id="ap-add-descripcion" required
+                        placeholder="Ej: pizza con queso muzzarella y rodajas de tomate">
+                    <input type="text" id="ap-add-categoria" required placeholder="Ej:Plato principal">
                     <input type="text" id="plato-imagen" placeholder="Ruta o nombre del archivo de imagen">
                 </label>
 
@@ -154,8 +118,58 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal EDITAR -->
+    <div class="ap-modal" id="ap-modal-editar" hidden>
+        <div class="ap-backdrop" data-ap-close-editar></div>
+
+        <div class="ap-dialog" role="dialog" aria-modal="true" aria-labelledby="ap-edit-title">
+            <header class="ap-header">
+                <h3 id="ap-edit-title">Editar plato</h3>
+                <button class="ap-close" data-ap-close-editar>x</button>
+            </header>
+
+            <form class="ap-form" id="ap-form-editar">
+                <label class="ap-row">
+                    <span>Seleccionar plato</span>
+                    <select id="ap-edit-select" required>
+                        <option value="">Cargando...</option>
+                    </select>
+                </label>
+
+                <label class="ap-row">
+                    <span>Nombre</span>
+                    <input type="text" id="ap-edit-nombre" required>
+                </label>
+
+                <label class="ap-row">
+                    <span>Descripción</span>
+                    <textarea id="ap-edit-descripcion" rows="3"></textarea>
+                </label>
+
+                <label class="ap-row">
+                    <span>Categoría</span>
+                    <input type="text" id="ap-edit-categoria">
+                </label>
+
+                <label class="ap-row">
+                    <span>Imagen (URL / archivo)</span>
+                    <input type="text" id="ap-edit-imagen">
+                </label>
+
+                <p id="ap-edit-msg" style="margin:8px 0 0 0; opacity:.85;"></p>
+
+                <footer class="ap-footer">
+                    <button type="button" class="ap-btn ap-btn-ghost" data-ap-close-editar>Cancelar</button>
+                    <button type="submit" class="ap-btn">Guardar</button>
+                </footer>
+            </form>
+        </div>
+    </div>
+
     <script type="module" src="/js/administrar_platos.js"></script>
-     <script type="module" src="/js/header.js"></script>
+    <script type="module" src="/js/header.js"></script>
+    <script type="module" src="/js/sidebar.js"></script>
 </body>
 
 </html>

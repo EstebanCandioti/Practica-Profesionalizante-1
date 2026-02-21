@@ -1,24 +1,34 @@
-import { getConfig, requireAdmin } from "./servicio.js";
+import { requireAdmin, getConfiguracion, actualizarFeriados } from "./servicio.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
-  const admin = requireAdmin("./index.html");
+  const admin = requireAdmin("./login.html");
   if (!admin) return;
 
   const calendarioDiv = document.getElementById("calendar");
   const botonGuardar = document.getElementById("feriados-guardar");
 
-  const configuracion = await getConfig();
-  const feriadosJson = configuracion.feriados;
+  // ── Cargar feriados actuales desde el backend ─────────────────────────────
 
-  const feriados = new Set();
-  for (const mes in feriadosJson) {
-    feriadosJson[mes].forEach((fecha) => feriados.add(fecha));
+  let feriadosOriginales = new Set();
+
+  try {
+    const config = await getConfiguracion();
+    // El backend devuelve feriados como array de strings "YYYY-MM-DD"
+    if (Array.isArray(config?.feriados)) {
+      config.feriados.forEach((f) => feriadosOriginales.add(f));
+    }
+  } catch (err) {
+    console.error("No se pudieron cargar los feriados:", err);
+    alert("Error al cargar la configuración. Intentá recargar la página.");
+    return;
   }
 
-  const feriadosActualizados = new Set(feriados);
-  console.log(feriadosActualizados);
+  // Copia mutable que refleja el estado actual del calendario
+  const feriadosActuales = new Set(feriadosOriginales);
 
-  const eventos = Array.from(feriadosActualizados).map((fecha) => ({
+  // ── Inicializar FullCalendar ──────────────────────────────────────────────
+
+  const eventos = Array.from(feriadosActuales).map((fecha) => ({
     title: "Feriado",
     start: fecha,
     color: "red",
@@ -29,53 +39,48 @@ document.addEventListener("DOMContentLoaded", async () => {
     locale: "es",
     selectable: true,
     height: "auto",
-    color:"white",
     events: eventos,
-    //Cuando se hace click en una fecha
+
+    // Click en una fecha: toggle feriado
     dateClick: (info) => {
       const fecha = info.dateStr;
 
-      //Si ya esta marcado como feriado lo borra
-      if (feriadosActualizados.has(fecha)) {
-        feriadosActualizados.delete(fecha);
-        //Lo remueve visual
+      if (feriadosActuales.has(fecha)) {
+        // Quitar feriado visualmente
+        feriadosActuales.delete(fecha);
         calendar.getEvents().forEach((evento) => {
-          if (evento.startStr === fecha) {
-            evento.remove();
-          }
+          if (evento.startStr === fecha) evento.remove();
         });
       } else {
-        feriadosActualizados.add(fecha);
-        calendar.addEvent({
-          title: "Feriado",
-          start: fecha,
-          color: "red",
-        });
+        // Agregar feriado visualmente
+        feriadosActuales.add(fecha);
+        calendar.addEvent({ title: "Feriado", start: fecha, color: "red" });
       }
     },
   });
 
   calendar.render();
 
-  botonGuardar.addEventListener("click", () => {
-    const nuevos = Array.from(feriadosActualizados).filter(
-      (f) => !feriados.has(f)
-    );
-    const eliminados = Array.from(feriados).filter(
-      (f) => !feriadosActualizados.has(f)
-    );
+  // ── Guardar cambios ───────────────────────────────────────────────────────
 
-    // Reorganizar los feriados finales por mes (para mostrar como en config.json)
-    const feriadosPorMes = {};
-    for (const fecha of feriadosActualizados) {
-      const mes = fecha.slice(0, 7); // ej. "2025-10"
-      if (!feriadosPorMes[mes]) feriadosPorMes[mes] = [];
-      feriadosPorMes[mes].push(fecha);
+  botonGuardar.addEventListener("click", async () => {
+    const listaFinal = Array.from(feriadosActuales).sort();
+
+    botonGuardar.disabled = true;
+    botonGuardar.textContent = "Guardando...";
+
+    try {
+      await actualizarFeriados(listaFinal);
+
+      // Actualizar la referencia original con el estado guardado
+      feriadosOriginales = new Set(feriadosActuales);
+
+      alert("Feriados guardados correctamente.");
+    } catch (err) {
+      alert("Error al guardar los feriados: " + err.message);
+    } finally {
+      botonGuardar.disabled = false;
+      botonGuardar.textContent = "Guardar cambios";
     }
-
-    console.log("Nuevos feriados:", nuevos);
-    console.log("Feriados eliminados:", eliminados);
-    console.log("Estado final:", feriadosPorMes);
-    alert("Cambios listos (ver consola).");
   });
 });

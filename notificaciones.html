@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+  <meta charset="utf-8" />
+  <title>Notificaciones</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="./css/styles.css" />
+  <link rel="stylesheet" href="./css/notificaciones.css" />
+  <link rel="stylesheet" href="./css/body.css">
+  <link rel="stylesheet" href="./css/sidebar/sidebar.css">
+  <link rel="stylesheet" href="./css/navbar/navbar.css">
+  <link rel="stylesheet" href="css/navbar/navbar_div.css">
+  <link rel="stylesheet" href="css/navbar/navbar_div_icono.css">
+  <link rel="stylesheet" href="css/navbar/navbar_btn_logout.css">
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css" />
+</head>
+
+<body>
+
+  <header>
+    <nav class="navbar">
+      <div class="navbar_div">
+        <img src="resources/restaurant.png" alt="plato de comida" class="navbar_div_icono" />
+        <p>Sistema de gestion de Pedidos</p>
+      </div>
+      <div class="navbar_div">
+        <img src="resources/usuario.png" alt="icono de usuario" class="navbar_div_icono" />
+        <p id="nombre-usuario-header"></p>
+        <button id="btn-logout" class="navbar_btn_logout"> Cerrar Sesion </button>
+      </div>
+    </nav>
+  </header>
+
+  <div class="body">
+    <aside class="sidebar">
+      <ul class="sidebar_lista">
+        <!-- El contenido se genera dinámicamente desde sidebar.js -->
+      </ul>
+    </aside>
+
+    <section class="notificaciones_main" style="padding:18px; flex:1;">
+      <h1 style="margin-bottom: 12px;">Notificaciones</h1>
+
+      <div id="noti-msg" style="margin-bottom: 12px; opacity: .85;"></div>
+
+      <div id="noti-list" class="notificaciones_lista"></div>
+    </section>
+  </div>
+
+  <script type="module" src="/js/notificaciones.js"></script>
+  <script type="module" src="/js/header.js"></script>
+  <script type="module" src="/js/sidebar.js"></script>
+</body>
+
+</html>

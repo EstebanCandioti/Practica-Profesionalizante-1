@@ -1,33 +1,52 @@
-import { requireAuth, getUsuarios, getUsuarioActivo } from "./servicio.js";
+import { requireAuth, getUsuarioActivo, actualizarUsuario } from "./servicio.js";
 
 function normalizarDia(nombreDia) {
   return nombreDia
     .toLowerCase()
-    .normalize("NFD") // separa tildes
-    .replace(/[\u0300-\u036f]/g, ""); // quita tildes (miércoles -> miercoles)
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
+// Front -> enum string del back
+function aEnumDia(diaNormalizado) {
+  const map = {
+    lunes: "LUNES",
+    martes: "MARTES",
+    miercoles: "MIERCOLES",
+    jueves: "JUEVES",
+    viernes: "VIERNES",
+  };
+  return map[diaNormalizado];
+}
+
+// UsuarioAsistencia (DB) -> enum strings
+function extraerDiasAsistenciaEnum(user) {
+  // back: diasAsistencia: [{ id, dia: "MARTES" }, ...]
+  if (Array.isArray(user.diasAsistencia)) {
+    return user.diasAsistencia.map((d) => d.dia);
+  }
+  // fallback viejo: dias_asistencia: ["martes",...]
+  if (Array.isArray(user.dias_asistencia)) {
+    return user.dias_asistencia.map((d) => aEnumDia(normalizarDia(d))).filter(Boolean);
+  }
+  return [];
 }
 
 function obtenerParesDiaCheckbox() {
   const contenedores = document.querySelectorAll(".configurar_asistencia_dia");
   const pares = [];
   contenedores.forEach((contenedor) => {
-    const etiquetaDia = contenedor.querySelector(
-      ".configurar_asistencia_dia_span"
-    );
-    const checkbox = contenedor.querySelector(
-      ".configurar_asistencia_checkbox"
-    );
+    const etiquetaDia = contenedor.querySelector(".configurar_asistencia_dia_span");
+    const checkbox = contenedor.querySelector(".configurar_asistencia_checkbox");
     if (!etiquetaDia || !checkbox) return;
 
-    // El texto visible del día (por ej. "Miércoles"), normalizado
     const textoDia = etiquetaDia.textContent.trim();
     const diaNormalizado = normalizarDia(textoDia);
-    pares.push({ dia: diaNormalizado, checkbox });
+    pares.push({ diaNormalizado, checkbox });
   });
   return pares;
 }
 
-/** Guarda el usuario en el mismo storage donde estaba (local o session) */
 function guardarUsuarioActivoActualizado(usuarioActualizado) {
   const clave = "usuarioActivo";
   const existeEnLocal = !!localStorage.getItem(clave);
@@ -36,56 +55,129 @@ function guardarUsuarioActivoActualizado(usuarioActualizado) {
 }
 
 async function init() {
-  // Proteger la página
   const usuarioActivo = requireAuth("./login.html");
   if (!usuarioActivo) return;
 
-  const usuariosRegistrados = await getUsuarios();
-  const datosUsuario =
-    usuariosRegistrados.find((u) => u.id === usuarioActivo.id) || usuarioActivo;
+  const user = getUsuarioActivo() || usuarioActivo;
 
-  // Marcar checkboxes según los días que ya tiene el usuario
-  const diasUsuario = (datosUsuario.dias_asistencia || []).map(normalizarDia);
+  // marcar checks segun lo que venga del back
+  const diasEnumActuales = extraerDiasAsistenciaEnum(user);
+  const diasNormalizados = diasEnumActuales.map((d) => normalizarDia(d));
+
   const pares = obtenerParesDiaCheckbox();
-  pares.forEach(({ dia, checkbox }) => {
-    checkbox.checked = diasUsuario.includes(dia);
+  pares.forEach(({ diaNormalizado, checkbox }) => {
+    checkbox.checked = diasNormalizados.includes(diaNormalizado);
   });
 
-  // Guardar cambios al presionar el botón
-  const botonGuardar = document.querySelector(".configurar_asistencia_boton");
-  const mensajeContenedor = document.createElement("p"); // mensaje simple de confirmación
-  mensajeContenedor.style.marginTop = "8px";
-  botonGuardar.insertAdjacentElement("afterend", mensajeContenedor);
+  // Obtener referencias del modal
+  const modal = document.getElementById("asistencia_modal");
+  const modalTitulo = document.getElementById("asistencia_modal_titulo");
+  const modalMensaje = document.getElementById("asistencia_modal_mensaje");
+  const modalBtn = document.getElementById("asistencia_modal_btn");
+  const modalBackdrop = document.querySelector(".asistencia_modal_backdrop");
 
-  botonGuardar.addEventListener("click", () => {
-    // Recolectar los días actualmente marcados
-    const diasSeleccionados = obtenerParesDiaCheckbox()
-      .filter(({ checkbox }) => checkbox.checked)
-      .map(({ dia }) => dia); // ya normalizados: "lunes", "martes", ...
+  // Funciones del modal usando clases CSS
+  function cerrarModal() {
+    if (modal) {
+      modal.classList.remove("show");
+    }
+  }
 
-    // Actualizar el objeto del usuario y persistir en la sesión
-    const usuarioActualizado = {
-      ...datosUsuario,
-      dias_asistencia: diasSeleccionados,
+  function mostrarModal(titulo, mensaje, esExito) {
+    if (!modal || !modalTitulo || !modalMensaje || !modalBtn) {
+      console.error("Elementos del modal no encontrados");
+      return;
+    }
+
+    // Actualizar contenido
+    modalTitulo.textContent = titulo;
+    modalMensaje.textContent = mensaje;
+
+    // Aplicar estilos segun tipo
+    if (esExito) {
+      modalTitulo.className = "asistencia_modal_titulo asistencia_modal_titulo--exito";
+      modalBtn.className = "asistencia_modal_btn asistencia_modal_btn--exito";
+    } else {
+      modalTitulo.className = "asistencia_modal_titulo asistencia_modal_titulo--error";
+      modalBtn.className = "asistencia_modal_btn asistencia_modal_btn--error";
+    }
+
+    // Mostrar modal agregando clase show
+    modal.classList.add("show");
+  }
+
+  function mostrarModalExito(mensaje) {
+    mostrarModal("Exito", mensaje, true);
+  }
+
+  function mostrarModalError(mensaje) {
+    mostrarModal("Error", mensaje, false);
+  }
+
+  // Configurar eventos del modal
+  if (modalBtn) {
+    modalBtn.onclick = function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      cerrarModal();
     };
-    guardarUsuarioActivoActualizado(usuarioActualizado);
+  }
 
-    // Feedback visual
-    mensajeContenedor.textContent =
-      "Días de asistencia guardados correctamente.";
+  if (modalBackdrop) {
+    modalBackdrop.onclick = function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      cerrarModal();
+    };
+  }
+
+  // Boton guardar
+  const botonGuardar = document.querySelector(".configurar_asistencia_boton");
+  if (!botonGuardar) return;
+
+  botonGuardar.addEventListener("click", async () => {
+    botonGuardar.disabled = true;
+
+    // recolectar dias seleccionados -> enum del back
+    const diasAsistencia = obtenerParesDiaCheckbox()
+      .filter(({ checkbox }) => checkbox.checked)
+      .map(({ diaNormalizado }) => aEnumDia(diaNormalizado))
+      .filter(Boolean);
+
+    // armar DTO obligatorio para el endpoint
+    const payload = {
+      id: user.idUsuario,
+      nombre: user.nombre,
+      apellido: user.apellido,
+      telefono: user.telefono,
+      direccion: user.direccion,
+      diasAsistencia
+    };
+
+    try {
+      await actualizarUsuario(payload);
+
+      // Como el back devuelve string, actualizamos localmente:
+      const usuarioActualizado = {
+        ...user,
+        diasAsistencia: diasAsistencia.map((dia) => ({ id: null, dia }))
+      };
+
+      guardarUsuarioActivoActualizado(usuarioActualizado);
+      
+      // Mostrar modal de exito
+      mostrarModalExito("Dias de asistencia guardados correctamente.");
+      
+    } catch (err) {
+      console.error(err);
+      
+      // Mostrar modal de error
+      mostrarModalError(err.message || "No se pudo guardar la asistencia.");
+      
+    } finally {
+      botonGuardar.disabled = false;
+    }
   });
 }
-
-//Busca el href configuracion y lo oculta si no se es admin
-document.addEventListener("DOMContentLoaded", () => {
-  const user = getUsuarioActivo();
-  const configLink = document.querySelector(
-    '.sidebar a[href="adm-configuracion.html"]'
-  );
-  if (configLink && (!user || user.rol !== "administrador")) {
-    const item = configLink.closest(".sidebar_lista_item");
-    if (item) item.style.display = "none";
-  }
-});
 
 init();

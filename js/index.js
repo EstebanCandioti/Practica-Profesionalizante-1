@@ -1,18 +1,25 @@
-console.log("index.js cargó");
+console.log("index.js cargo");
 
-import { getUsuarios, getConfig, requireAuth, getPedidos, getUsuarioActivo } from "./servicio.js";
+import { 
+  getUsuarios, 
+  requireAuth, 
+  getUsuarioActivo,
+  getPedidosPorUsuario,
+  getNotificacionesPorUsuario,
+  getConfiguracion,
+  logout
+} from "./servicio.js";
 
-//Busca el href configuracion y lo oculta si no se es admin
-document.addEventListener("DOMContentLoaded", () => {
-  const user = getUsuarioActivo();
-  const configLink = document.querySelector(
-    '.sidebar a[href="adm-configuracion.html"]'
-  );
-  if (configLink && (!user || user.rol !== "administrador")) {
-    const item = configLink.closest(".sidebar_lista_item");
-    if (item) item.style.display = "none";
+async function cargarPedidosUsuarioSeguros(idUsuario) {
+  try {
+    return await getPedidosPorUsuario(idUsuario);
+  } catch (err) {
+    if (err.message.includes("404")) {
+      return [];
+    }
+    throw err;
   }
-});
+}
 
 // Cambia el texto del elemento con el id indicado
 function setTexto(idElemento, nuevoTexto) {
@@ -23,20 +30,13 @@ function setTexto(idElemento, nuevoTexto) {
 // Devuelve la fecha actual en formato "YYYY-MM-DD"
 function obtenerFechaActualISO() {
   const fechaActual = new Date();
-  const año = fechaActual.getFullYear();
+  const anio = fechaActual.getFullYear();
   const mes = String(fechaActual.getMonth() + 1).padStart(2, "0");
   const dia = String(fechaActual.getDate()).padStart(2, "0");
-  return `${año}-${mes}-${dia}`;
+  return `${anio}-${mes}-${dia}`;
 }
 
-// True si la fechaISO está listada como feriado en config.json
-function esFeriado(configuracion, fechaISO) {
-  const añoYMes = fechaISO.slice(0, 7); // "2025-10"
-  const feriadosDelMes = configuracion?.feriados?.[añoYMes] || [];
-  return feriadosDelMes.includes(fechaISO);
-}
-
-// True si la hora actual es anterior al horario límite de pedidos ("HH:MM")
+// True si la hora actual es anterior al horario limite de pedidos ("HH:MM")
 function antesDeHorarioLimite(horaLimitePedidos) {
   const [horaLimite, minutoLimite] = horaLimitePedidos.split(":").map(Number);
   const ahora = new Date();
@@ -45,90 +45,147 @@ function antesDeHorarioLimite(horaLimitePedidos) {
   return ahora.getTime() < limiteHoy.getTime();
 }
 
-// Normaliza nombres de día para comparar (“miércoles” vs “miercoles”)
+// Normaliza nombres de dia para comparar ("miercoles" vs "miercoles", "MARTES" → "martes")
 function normalizarDia(nombreDia) {
+  if (!nombreDia) return "";
   return nombreDia
     .toLowerCase()
-    .replace("á", "a")
-    .replace("é", "e")
-    .replace("í", "i")
-    .replace("ó", "o")
-    .replace("ú", "u");
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
 }
 
+// Oculta el link de configuracion si el usuario NO es admin del restaurante
+document.addEventListener("DOMContentLoaded", () => {
+  const user = getUsuarioActivo();
+  const configLink = document.querySelector(
+    '.sidebar a[href="adm-configuracion.html"]'
+  );
+
+  const esUsuarioRestaurante = user && user.es_usuario_restaurante === true;
+
+  if (configLink && !esUsuarioRestaurante) {
+    const item = configLink.closest(".sidebar_lista_item");
+    if (item) item.style.display = "none";
+  }
+});
+
 async function init() {
-  // 1) Requiere sesión (redirige a login si no hay)
+  // 1) Requiere sesion (redirige a login si no hay)
   const usuarioActivo = requireAuth("./login.html");
   if (!usuarioActivo) return;
 
-  // 2) Carga datos en paralelo
-  const [usuariosRegistrados, configuracion, pedidosRegistrados] =
-    await Promise.all([getUsuarios(), getConfig(), getPedidos()]);
-  console.log(usuariosRegistrados, configuracion, pedidosRegistrados);
+  // 2) Carga usuarios, pedidos y configuracion desde el back en paralelo
+  const [usuariosRegistrados, pedidosRegistrados, config] = await Promise.all([
+    getUsuarios(),
+    cargarPedidosUsuarioSeguros(usuarioActivo.idUsuario),
+    getConfiguracion().catch((err) => {
+      console.error("No se pudo cargar la configuracion:", err);
+      return { horarioLimite: "10:30" }; // fallback por si el back no responde
+    }),
+  ]);
 
-  // 3) Usuario actual (por si cambió algo en usuarios.json)
+  const HORA_LIMITE_PEDIDOS = config?.horarioLimite || "10:30";
+
+  console.log("Usuarios:", usuariosRegistrados);
+  console.log("Pedidos:", pedidosRegistrados);
+  console.log("Horario limite:", HORA_LIMITE_PEDIDOS);
+
+  // 3) Usuario actual segun la DB
   const datosUsuario =
-    usuariosRegistrados.find((u) => u.id === usuarioActivo.id) || usuarioActivo;
+    usuariosRegistrados.find(
+      (u) => u.idUsuario === usuarioActivo.idUsuario
+    ) || usuarioActivo;
 
-  // 4) Carta: Días de asistencia (tu JSON ahora trae ["lunes","miercoles","viernes"])
-  const diasAsistencia = (datosUsuario.dias_asistencia || []).map(
-    normalizarDia
+  // 4) Carta: Dias de asistencia
+  const diasAsistencia = (datosUsuario.diasAsistencia || []).map((item) =>
+    normalizarDia(item.dia)
   );
   const diasAsistenciaTexto = diasAsistencia.join(", ");
-  setTexto("home_asistencia", diasAsistenciaTexto || "Sin días configurados");
+  setTexto(
+    "home_asistencia",
+    diasAsistenciaTexto || "Sin dias de asistencia configurados"
+  );
 
-  // 5) Carta: Último pedido
-  const pedidosDelUsuario = pedidosRegistrados
-    .filter((pedido) => pedido.usuario_id === datosUsuario.id)
-    .sort((a, b) => (a.fecha < b.fecha ? 1 : -1));
+  // 5) Carta: Ultimo pedido
+  const pedidosDelUsuario = (pedidosRegistrados || []).sort((a, b) => {
+    const fechaA = a.fechaPedido || a.fecha_pedido || "";
+    const fechaB = b.fechaPedido || b.fecha_pedido || "";
+    return fechaA < fechaB ? 1 : -1;
+  });
 
   if (pedidosDelUsuario.length > 0) {
     const ultimoPedido = pedidosDelUsuario[0];
-    setTexto("home_ultima_fecha", ultimoPedido.fecha);
-    setTexto("home_ultimo_plato", String(ultimoPedido.platos || ""));
+    const fechaUltimoPedido =
+      ultimoPedido.fechaPedido ||
+      ultimoPedido.fecha_pedido ||
+      ultimoPedido.fechaEntrega ||
+      ultimoPedido.fecha_entrega ||
+      "—";
+    const estadoUltimoPedido =
+      ultimoPedido.estado || ultimoPedido.estadoPedido || "";
+
+    setTexto("home_ultima_fecha", fechaUltimoPedido);
+    setTexto(
+      "home_ultimo_plato",
+      estadoUltimoPedido ? `Estado: ${estadoUltimoPedido}` : "Pedido realizado"
+    );
   } else {
     setTexto("home_ultima_fecha", "—");
-    setTexto("home_ultimo_plato", "Aún no realizaste pedidos");
+    setTexto("home_ultimo_plato", "Aun no realizaste pedidos");
   }
 
-  // 6) Carta: Aviso y horario límite
-  const horaLimitePedidos = configuracion.horario_limite_pedidos;
+  // 6) Carta: Horario limite y aviso
   setTexto(
     "home_horario_limite",
-    `El horario limite para pedir es ${horaLimitePedidos} `
+    `El horario limite para pedir es ${HORA_LIMITE_PEDIDOS}`
   );
 
-  const fechaActualISO = obtenerFechaActualISO();
-  const hoyEsFeriado = esFeriado(configuracion, fechaActualISO);
-
-  // nombre de día actual en español (p.ej. "miércoles"), normalizado para comparar
   const nombreDiaHoy = normalizarDia(
     new Date().toLocaleDateString("es-AR", { weekday: "long" })
   );
 
   let mensajeAviso = "";
 
-  if (hoyEsFeriado) {
-    mensajeAviso = "Hoy es feriado. No se toman pedidos.";
-  } else if (
-    !["lunes", "martes", "miercoles", "jueves", "viernes"].includes(
-      nombreDiaHoy
-    )
+  if (
+    !["lunes", "martes", "miercoles", "jueves", "viernes"].includes(nombreDiaHoy)
   ) {
     mensajeAviso = "Hoy no hay pedidos (fin de semana).";
   } else if (!diasAsistencia.includes(nombreDiaHoy)) {
-    mensajeAviso = "Hoy no es uno de tus días de asistencia.";
-  } else if (antesDeHorarioLimite(horaLimitePedidos)) {
-    mensajeAviso = `Estás a tiempo. Tenés hasta las ${horaLimitePedidos} para pedir.`;
+    mensajeAviso = "Hoy no es uno de tus dias de asistencia.";
+  } else if (antesDeHorarioLimite(HORA_LIMITE_PEDIDOS)) {
+    mensajeAviso = `Estas a tiempo. Tenes hasta las ${HORA_LIMITE_PEDIDOS} para pedir.`;
   } else {
-    mensajeAviso = `Cerrado. El horario límite de hoy (${horaLimitePedidos}) ya pasó.`;
+    mensajeAviso = `Cerrado. El horario limite de hoy (${HORA_LIMITE_PEDIDOS}) ya paso.`;
   }
 
   setTexto("home_aviso", mensajeAviso);
 
-  // 7) Carta: Notificaciones (placeholder)
-  setTexto("home_notif", "No tienes notificaciones nuevas");
+  // 7) Carta: Notificaciones - Mostrar solo las NO LEIDAS
+  try {
+    const notificaciones = await getNotificacionesPorUsuario(usuarioActivo.idUsuario);
+    
+    // Filtrar solo las notificaciones no leidas
+    const noLeidas = (notificaciones || []).filter(n => n.leida === false);
+    
+    if (noLeidas.length === 0) {
+      setTexto("home_notificacion", "No tienes notificaciones nuevas");
+    } else {
+      // Mostrar la cantidad de notificaciones no leidas
+      const cantidad = noLeidas.length;
+      const textoNotif = cantidad === 1 
+        ? "Tienes 1 notificacion nueva" 
+        : `Tienes ${cantidad} notificaciones nuevas`;
+      setTexto("home_notificacion", textoNotif);
+    }
+  } catch (err) {
+    // Si es 404, no hay notificaciones (no es error)
+    if (err.message.includes("404")) {
+      setTexto("home_notificacion", "No tienes notificaciones nuevas");
+    } else {
+      console.error("Error al cargar notificaciones:", err);
+      setTexto("home_notificacion", "No tienes notificaciones nuevas");
+    }
+  }
 }
-
 
 init();

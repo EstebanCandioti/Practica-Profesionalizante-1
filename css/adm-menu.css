@@ -1,0 +1,48 @@
+.adm_menu_card{
+  background:#fff;
+  border-radius:10px;
+  padding:14px 16px;
+  box-shadow:0 2px 6px rgba(0,0,0,.1);
+  max-width:1000px;
+  margin-top:14px;
+}
+
+.adm_menu_row{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  flex-wrap:wrap;
+}
+
+.adm_menu_row2{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  margin-top:10px;
+}
+
+#lista-platos .item{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  padding:10px 12px;
+  border:1px solid rgba(0,0,0,.08);
+  border-radius:8px;
+  margin-top:10px;
+}
+
+
+
+.adm-menu-btn-buscar, #btn-guardar-menu, #btn-agregar-plato{
+    background-color: black;
+    padding: 0.5rem 1rem;
+    color: #ffff;
+    cursor: pointer;
+    border: none;
+    border-radius: 20px;
+}
+
+.adm-menu-btn-buscar:hover, #btn-guardar-menu:hover, #btn-agregar-plato:hover{
+    background-color:  rgb(63, 62, 62);
+    transition: 0.4s;
+}

@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Administrar menús del día</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="./css/styles.css" />
+    <link rel="stylesheet" href="./css/adm-menu.css" />
+    <link rel="stylesheet" href="css/body.css">
+    <link rel="stylesheet" href="css/sidebar/sidebar.css">
+    <link rel="stylesheet" href="css/navbar/navbar.css">
+    <link rel="stylesheet" href="css/navbar/navbar_div.css">
+    <link rel="stylesheet" href="css/navbar/navbar_div_icono.css">
+    <link rel="stylesheet" href="css/navbar/navbar_btn_logout.css">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css">
+</head>
+
+<body>
+
+    <header>
+        <nav class="navbar">
+            <div class="navbar_div">
+                <img src="resources/restaurant.png" alt="plato de comida" class="navbar_div_icono" />
+                <p>Sistema de gestion de Pedidos</p>
+            </div>
+            <div class="navbar_div">
+                <img src="resources/usuario.png" alt="icono de usuario" class="navbar_div_icono" />
+                <p id="nombre-usuario-header"></p>
+                <button id="btn-logout" class="navbar_btn_logout"> Cerrar Sesion </button>
+            </div>
+        </nav>
+    </header>
+
+    <div class="body">
+        <aside class="sidebar">
+            <ul class="sidebar_lista">
+                <!-- El contenido se genera dinámicamente desde sidebar.js -->
+            </ul>
+        </aside>
+
+        <section style="padding:18px; flex:1;">
+            <h1>Pedidos de la semana</h1>
+
+            <!-- Fila de controles -->
+            <div style="display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap; margin: 12px 0 16px 0;">
+                <div>
+                    <label><b>Fecha de referencia</b></label><br />
+                    <input id="fechaReferencia" type="date" />
+                </div>
+
+                <div>
+                    <label><b>Semana</b></label><br />
+                    <select id="selectorSemana">
+                        <option value="0">Actual</option>
+                        <option value="1">Entrante</option>
+                    </select>
+                </div>
+
+                <button id="btn-cargar">Cargar</button>
+            </div>
+
+            <!-- Estado / mensajes -->
+            <div style="display:flex; align-items:center; gap:16px; margin-bottom:12px;">
+                <p id="cantidadPedidos" style="margin:0;">Pedidos cargados: —</p>
+                <p id="msg" style="margin:0; opacity:.85;"></p>
+            </div>
+
+            <!-- Contenedor de pedidos -->
+            <div id="contenedor"></div>
+
+            <!-- Botón de confirmación -->
+            <div style="margin-top:16px;">
+                <button id="btn-confirmar-semana" disabled>Confirmar semana</button>
+            </div>
+
+        </section>
+
+    </div>
+
+    <script type="module" src="/js/adm-pedido-semanal.js"></script>
+    <script type="module" src="/js/header.js"></script>
+    <script type="module" src="/js/sidebar.js"></script>
+</body>
+
+</html>

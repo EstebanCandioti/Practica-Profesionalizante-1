@@ -1,0 +1,14 @@
+.mi_pedido_boton{
+    background-color: black;
+    color: #ffff;
+    padding: 1rem 1.5rem;
+    margin-left: 2rem;
+    cursor: pointer;
+    border: none;
+}
+
+.mi_pedido_boton:hover{
+    background-color: rgb(63, 62, 62);
+    transition: 0.4s;
+
+}

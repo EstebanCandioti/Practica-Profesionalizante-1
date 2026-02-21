@@ -1,5 +1,6 @@
-import { getUsuarios } from './servicio.js';
-console.log("login cargo")
+// js/login.js
+import { loginUsuario } from './servicio.js';
+console.log("login cargó");
 
 const form     = document.getElementById('login-form');
 const emailEl  = document.getElementById('email');
@@ -9,10 +10,9 @@ const btn      = document.getElementById('btn-login');
 const msg      = document.getElementById('login-msg');
 
 // Si ya hay sesión activa, redirige
-(function autoRedirect(){
+(function autoRedirect() {
   const raw = localStorage.getItem('usuarioActivo') || sessionStorage.getItem('usuarioActivo');
   if (!raw) return;
-  const user = JSON.parse(raw);
   window.location.href = './index.html';
 })();
 
@@ -25,25 +25,18 @@ form.addEventListener('submit', async (e) => {
   const pass  = passEl.value;
 
   try {
-    const usuarios = await getUsuarios();
-    const user = usuarios.find(u => u.email.toLowerCase() === email && u.password === pass);
+    await loginUsuario({
+      email,
+      password: pass,
+      recordarSesion: remember.checked
+    });
 
-    if (!user) {
-      msg.textContent = 'Usuario o contraseña incorrectos.';
-      btn.disabled = false;
-      return;
-    }
-
-    // Guardar sesión (sin contraseña)
-    const { password, ...safeUser } = user;
-    const storage = remember.checked ? localStorage : sessionStorage;
-    storage.setItem('usuarioActivo', JSON.stringify(safeUser));
-
-    // Redirigir 
+    // Si el login fue OK, el usuario ya está guardado en storage
     window.location.href = './index.html';
   } catch (err) {
     console.error(err);
-    msg.textContent = 'No se pudo iniciar sesión. Intenta nuevamente.';
+    // El mensaje viene del back: "Contrasenia incorrecta", "El usuario se encuentra inactivo", etc.
+    msg.textContent = err.message || 'No se pudo iniciar sesión. Intenta nuevamente.';
     btn.disabled = false;
   }
 });

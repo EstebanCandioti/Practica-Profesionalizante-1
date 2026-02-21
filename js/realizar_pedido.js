@@ -1,239 +1,331 @@
 import {
   requireAuth,
-  getUsuarios,
-  getPlatos,
-  getConfig,
-  getPedidos,
   getUsuarioActivo,
+  getPedidosSemana,
+  crearPedido,
+  crearPedidoDia,
+  getMenusDiaPorSemana,
+  getMenuPlatosPorFecha,
+  getPedidosPorUsuario,
 } from "./servicio.js";
 
-function normalizarDia(nombreDia) {
-  return nombreDia
+let fechaSeleccionadaISO = null;
+let menuDiaActual = null; // el MenuDia encontrado para esa fecha
+let pedidoSemanaCache = null; // para saber si ya hay pedido ese día
+
+document.getElementById("btn-cant-mas")?.addEventListener("click", () => {
+  const input = document.getElementById("cantidad_personas");
+  input.value = String(Math.max(1, Number(input.value || 1) + 1));
+});
+
+document.getElementById("btn-cant-menos")?.addEventListener("click", () => {
+  const input = document.getElementById("cantidad_personas");
+  input.value = String(Math.max(1, Number(input.value || 1) - 1));
+});
+
+function setMensaje(texto, ok = true) {
+  const modal = document.getElementById("modal-mensaje");
+  const textoEl = document.getElementById("modal-mensaje-texto");
+  const btnCerrar = document.getElementById("modal-mensaje-cerrar");
+
+  if (!modal || !textoEl) return;
+
+  textoEl.textContent = texto;
+  textoEl.style.color = ok ? "#1a7a3c" : "#b00020";
+  modal.style.display = "flex";
+
+  btnCerrar.onclick = () => {
+    modal.style.display = "none";
+    if (ok) location.reload();
+  };
+
+  modal.onclick = (e) => {
+    if (e.target === modal) {
+      modal.style.display = "none";
+      if (ok) location.reload();
+    }
+  };
+}
+
+function obtenerIdPlatoSeleccionado() {
+  const seleccionado = document.querySelector('input[name="menu"]:checked');
+  if (!seleccionado) return null;
+  return Number(seleccionado.dataset.idPlato);
+}
+
+function normalizarDia(texto) {
+  return (texto || "")
     .toLowerCase()
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, ""); // quita tildes
+    .replace(/[\u0300-\u036f]/g, "");
 }
+
 function obtenerFechaActualISO() {
-  const d = new Date();
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${y}-${m}-${day}`;
+  const hoy = new Date();
+  const anio = hoy.getFullYear();
+  const mes = String(hoy.getMonth() + 1).padStart(2, "0");
+  const dia = String(hoy.getDate()).padStart(2, "0");
+  return `${anio}-${mes}-${dia}`; // YYYY-MM-DD
 }
 
-function esFeriado(configuracion, fechaISO) {
-  const añoMes = fechaISO.slice(0, 7); // "YYYY-MM"
-  const feriadosDelMes = configuracion?.feriados?.[añoMes] || [];
-  return feriadosDelMes.includes(fechaISO);
+function obtenerLunesDeSemana(date) {
+  const fecha = new Date(date);
+  fecha.setHours(0, 0, 0, 0);
+  const diaSemana = fecha.getDay(); // 0 dom ... 6 sab
+  const diferenciaALunes = (diaSemana + 6) % 7;
+  fecha.setDate(fecha.getDate() - diferenciaALunes);
+  return fecha;
 }
 
-function antesDeHorarioLimite(horaLimitePedidos) {
-  const [h, m] = horaLimitePedidos.split(":").map(Number);
-  const ahora = new Date();
-  const limiteHoy = new Date();
-  limiteHoy.setHours(h, m, 0, 0);
-  return ahora.getTime() < limiteHoy.getTime();
+function aISOFechaLocal(date) {
+  const anio = date.getFullYear();
+  const mes = String(date.getMonth() + 1).padStart(2, "0");
+  const dia = String(date.getDate()).padStart(2, "0");
+  return `${anio}-${mes}-${dia}`;
 }
-function leerPedidosLocales() {
-  try {
-    return JSON.parse(localStorage.getItem("pedidos_local")) || [];
-  } catch {
-    return [];
+
+// lunes→viernes semana entrante
+function obtenerSemanaEntranteISO() {
+  const lunesEstaSemana = obtenerLunesDeSemana(new Date());
+  lunesEstaSemana.setDate(lunesEstaSemana.getDate() + 7);
+
+  const nombres = ["lunes", "martes", "miercoles", "jueves", "viernes"];
+  const mapa = {};
+
+  for (let indice = 0; indice < 5; indice++) {
+    const fecha = new Date(lunesEstaSemana);
+    fecha.setDate(lunesEstaSemana.getDate() + indice);
+    mapa[nombres[indice]] = aISOFechaLocal(fecha);
   }
+
+  return mapa; // { lunes: "YYYY-MM-DD", ... }
 }
 
-function guardarPedidosLocales(arr) {
-  localStorage.setItem("pedidos_local", JSON.stringify(arr));
-}
-
-function fusionarPedidos(pedidosJSON, pedidosLocal) {
-  return [...(pedidosJSON || []), ...(pedidosLocal || [])];
-}
-
-function existePedidoHoy(pedidosFusionados, usuarioId, fechaISO) {
-  return pedidosFusionados.some(
-    (p) => p.usuario_id === usuarioId && p.fecha === fechaISO
-  );
-}
-function crearIdPedido() {
-  // simple autoincremental basado en localStorage
-  const key = "pedido_seq";
-  const n = Number(localStorage.getItem(key) || 0) + 1;
-  localStorage.setItem(key, String(n));
-  return n;
-}
-
-function renderPlatos(platosDelDia, contenedorCartas) {
+function renderMenuPlatos(menuPlatos, contenedorCartas) {
   contenedorCartas.innerHTML = "";
-  if (!platosDelDia.length) {
-    contenedorCartas.innerHTML = `<p style="padding:12px">No hay platos disponibles para este día.</p>`;
-    return;
+  if (!Array.isArray(menuPlatos) || menuPlatos.length === 0) {
+    /* ... */ return;
   }
 
-  // Bootstrap grid: cada carta tiene col-3 como tu HTML
-  const frag = document.createDocumentFragment();
+  const fragmento = document.createDocumentFragment();
 
-  platosDelDia.forEach((plato, idx) => {
+  menuPlatos.forEach((menuPlato, indice) => {
+    const plato = menuPlato.plato;
+    console.log("menuPlato completo:", menuPlato);
+    console.log("menuPlato.plato:", menuPlato.plato);
+    const idPlato = plato.id_plato;
+    const nombre = plato?.nombre ?? "(sin nombre)";
+    const imagen = plato?.imagen ? plato.imagen : "/resources/milanesa.jpg";
+    const stock = menuPlato.stockDisponible ?? 0;
+    const idMenuDia = menuPlato.menuDia.idMenuDia;
+
     const carta = document.createElement("div");
     carta.className = "realizar_pedido_container_cartas_carta col-3";
     carta.innerHTML = `
-      <img src="${plato.imagen || "/resources/platos/default.jpg"}"
-           alt="${plato.name}"
-           class="realizar_pedido_container_cartas_carta_foto" />
-      <p class="realizar_pedido_container_cartas_carta_texto">${plato.name}</p>
-      <input type="radio" name="menu" class="realizar_pedido_container_cartas_carta_input" value="${
-        plato.name
-      }" ${idx === 0 ? "checked" : ""}/>
+      <img src="${imagen}" alt="${nombre}" class="realizar_pedido_container_cartas_carta_foto" />
+      <p class="realizar_pedido_container_cartas_carta_texto">${nombre}</p>
+      <p style="margin:0; opacity:.8;">Stock: ${stock}</p>
+      <input
+        type="radio"
+        name="menu"
+        class="realizar_pedido_container_cartas_carta_input"
+        data-id-plato="${idPlato}"
+        data-id-menu-dia="${idMenuDia}"
+        ${indice === 0 ? "checked" : ""}
+      />
     `;
-    frag.appendChild(carta);
+
+    fragmento.appendChild(carta);
   });
 
-  contenedorCartas.appendChild(frag);
+  contenedorCartas.appendChild(fragmento);
 }
 
+let cacheMenusSemana = null; // Array<MenuDia>
+const cachePlatosPorFecha = {}; // { "YYYY-MM-DD": Array<MenuPlato> }
+
+async function cargarSemanaEntrante() {
+  const hoyISO = obtenerFechaActualISO();
+  cacheMenusSemana = await getMenusDiaPorSemana(hoyISO, 1); // offset=1 => semana entrante
+}
+
+async function cargarYMostrarDia(
+  diaNormalizado,
+  fechasSemanaEntrante,
+  contenedorCartas,
+) {
+  const fechaISO = fechasSemanaEntrante[diaNormalizado];
+  fechaSeleccionadaISO = fechaISO;
+  menuDiaActual = null;
+  if (!fechaISO) {
+    contenedorCartas.innerHTML = `<p style="padding:12px">Día inválido.</p>`;
+    return;
+  }
+
+  contenedorCartas.innerHTML = `<p style="padding:12px">Cargando...</p>`;
+
+  try {
+    if (!cacheMenusSemana) {
+      await cargarSemanaEntrante();
+    }
+
+    // Busco el MenuDia por fecha exacta (sin problemas de weekday/timezone)
+    const menuDia = (cacheMenusSemana || []).find((m) => m.fecha === fechaISO);
+
+    if (!menuDia) {
+      contenedorCartas.innerHTML = `<p style="padding:12px">No hay menú cargado para ${fechaISO}.</p>`;
+      return;
+    }
+
+    if (!cachePlatosPorFecha[fechaISO]) {
+      cachePlatosPorFecha[fechaISO] = await getMenuPlatosPorFecha(fechaISO);
+    }
+
+    renderMenuPlatos(cachePlatosPorFecha[fechaISO], contenedorCartas);
+  } catch (error) {
+    console.error(error);
+    contenedorCartas.innerHTML = `<p style="padding:12px">No hay menú cargado para ${fechaISO}.</p>`;
+  }
+}
+
+// Variable para guardar el id de Pedido (si ya existe)
+let idPedido = null;
+
+// Llamar cuando el usuario haga click en "Realizar pedido"
+async function onRealizarPedidoClick() {
+  try {
+    const diaSeleccionado = fechaSeleccionadaISO;
+
+    const seleccionado = document.querySelector('input[name="menu"]:checked');
+    if (!seleccionado) {
+      setMensaje("Selecciona un plato para el día", false);
+      return;
+    }
+
+    const idPlatoSeleccionado = Number(seleccionado.dataset.idPlato);
+    const idMenuDia = Number(seleccionado.dataset.idMenuDia);
+    const cantidadPersonas = Number(
+      document.getElementById("cantidad_personas")?.value || 1,
+    );
+
+    if (!Number.isFinite(idPlatoSeleccionado) || !Number.isFinite(idMenuDia)) {
+      setMensaje("No se pudo determinar el plato o el menú del día.", false);
+      return;
+    }
+
+    if (!diaSeleccionado) {
+      setMensaje("Selecciona un día para realizar el pedido", false);
+      return;
+    }
+
+    // si no hay pedidos, esto devuelve []
+    const pedidosSemana = await getPedidosSemana(obtenerFechaActualISO(), 1);
+    const pedidoExistente = (pedidosSemana || []).find(
+      (p) =>
+        p.fechaEntrega === diaSeleccionado &&
+        Number(p.idUsuario) === Number(getUsuarioActivo().idUsuario),
+    );
+    // Si no existe pedido para ese día, lo creamos
+    if (!pedidoExistente) {
+      await crearPedido({
+        idUsuario: getUsuarioActivo().idUsuario,
+        fecha_pedido: diaSeleccionado,
+        cantidad_personas: cantidadPersonas,
+        estado: "Pendiente",
+      });
+
+      // recuperar el idPedido creado
+      const pedidosUsuario = await getPedidosPorUsuario(
+        getUsuarioActivo().idUsuario,
+      );
+
+      const pedidosDelDia = (pedidosUsuario || []).filter(
+        (p) => p.fechaPedido === diaSeleccionado,
+      );
+
+      if (pedidosDelDia.length === 0) {
+        console.error("Pedidos usuario:", pedidosUsuario);
+        setMensaje("Se creó el pedido pero no se pudo recuperar su ID.", false);
+        return;
+      }
+
+      // Tomamos el último creado (mayor idPedido)
+      pedidosDelDia.sort((a, b) => a.idPedido - b.idPedido);
+      const pedidoDelDia = pedidosDelDia[pedidosDelDia.length - 1];
+
+      const idPedidoCreado = pedidoDelDia.idPedido;
+
+      await crearPedidoDia({
+        idPedido: idPedidoCreado,
+        idMenuDia: idMenuDia, // viene del radio
+        idPlato: idPlatoSeleccionado,
+        fechaEntrega: diaSeleccionado,
+      });
+
+      setMensaje("Pedido creado correctamente", true);
+      return;
+    }
+    setMensaje(
+      "Ya existe un pedido para ese día.",
+      false,
+    );
+  } catch (error) {
+    console.error("Error al realizar el pedido", error);
+    setMensaje(
+      "Hubo un error al realizar el pedido. Intenta nuevamente.",
+      false,
+    );
+  }
+}
+
+// Llamamos a este evento cuando se haga click en "Realizar pedido"
+document
+  .getElementById("realizar_pedido")
+  .addEventListener("click", onRealizarPedidoClick);
+
 async function init() {
-  // 1) Sesión
   const usuarioActivo = requireAuth("./login.html");
   if (!usuarioActivo) return;
 
-  // 2) Datos
-  const [usuarios, platos, config, pedidosJSON] = await Promise.all([
-    getUsuarios(),
-    getPlatos(),
-    getConfig(),
-    getPedidos(),
-  ]);
-  const datosUsuario =
-    usuarios.find((u) => u.id === usuarioActivo.id) || usuarioActivo;
+  const usuario = getUsuarioActivo() || usuarioActivo;
 
-  // 3) Contexto de hoy
-  const fechaHoyISO = obtenerFechaActualISO();
-  const nombreDiaHoy = normalizarDia(
-    new Date().toLocaleDateString("es-AR", { weekday: "long" })
-  ); // ej. "miercoles"
-  const esFeriadoHoy = esFeriado(config, fechaHoyISO);
-  const dentroDeHorario = antesDeHorarioLimite(config.horario_limite_pedidos);
-  const diasAsistencia = (datosUsuario.dias_asistencia || []).map(
-    normalizarDia
+  // asistencia: [{dia:"MARTES"}, ...]
+  const diasAsistenciaNormalizados = (usuario.diasAsistencia || []).map(
+    (item) => normalizarDia(item.dia),
   );
-  const asisteHoy = diasAsistencia.includes(nombreDiaHoy);
 
-  // 4) Habilitar botones de días según asistencia
+  const fechasSemanaEntrante = obtenerSemanaEntranteISO();
+
   const botonesDias = Array.from(
-    document.querySelectorAll(".realizar_pedido_container_dias_dia")
+    document.querySelectorAll(".realizar_pedido_container_dias_dia"),
   );
-  // Agregamos data-dia normalizado a cada botón leyendo su texto (Lunes, Martes, etc.)
-  botonesDias.forEach((btn) => {
-    btn.dataset.dia = normalizarDia(btn.textContent.trim());
-    // deshabilita si no está en días de asistencia
-    btn.disabled = !diasAsistencia.includes(btn.dataset.dia);
-  });
 
-  // 5) Contenedor de cartas
   const contenedorCartas = document.querySelector(
-    ".realizar_pedido_container_cartas"
+    ".realizar_pedido_container_cartas",
   );
+  if (!contenedorCartas) return;
 
-  // 6) Función para mostrar platos de un día
-  function mostrarDia(diaNormalizado) {
-    const platosDelDia = platos.filter(
-      (p) => normalizarDia(p.day) === diaNormalizado
-    );
-    renderPlatos(platosDelDia, contenedorCartas);
-  }
+  // seteo dataset + disabled según asistencia
+  botonesDias.forEach((boton) => {
+    const diaNormalizado = normalizarDia(boton.textContent.trim());
+    boton.dataset.dia = diaNormalizado;
+    boton.disabled = !diasAsistenciaNormalizados.includes(diaNormalizado);
 
-  // 7) Click en botones de día → render
-  botonesDias.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      mostrarDia(btn.dataset.dia);
+    boton.addEventListener("click", () => {
+      cargarYMostrarDia(diaNormalizado, fechasSemanaEntrante, contenedorCartas);
     });
   });
 
-  // 8) Carga inicial: si hoy es un día de asistencia, mostrar ese
-  if (diasAsistencia.includes(nombreDiaHoy)) {
-    const btnHoy = botonesDias.find((b) => b.dataset.dia === nombreDiaHoy);
-    if (btnHoy) btnHoy.click();
+  // pre-cargo semana entrante (una sola vez)
+  await cargarSemanaEntrante();
+
+  // primer día habilitado
+  const primerHabilitado = botonesDias.find((b) => !b.disabled);
+  if (primerHabilitado) {
+    primerHabilitado.click();
   } else {
-    // si no asiste hoy, mostrar el primer día habilitado (si existe)
-    const primero = botonesDias.find((b) => !b.disabled);
-    if (primero) primero.click();
+    contenedorCartas.innerHTML = `<p style="padding:12px">No tenés días de asistencia configurados.</p>`;
   }
-
-  // 9) “Realizar pedido”
-  const botonConfirmar = document.querySelector(
-    ".realizar_pedido_container_boton"
-  );
-  botonConfirmar.addEventListener("click", () => {
-    // El día actualmente mostrado es el último botón presionado; lo inferimos por el radio renderizado
-    const radios = document.querySelectorAll(
-      ".realizar_pedido_container_cartas_carta_input"
-    );
-    if (!radios.length) {
-      alert("No hay platos para el día seleccionado.");
-      return;
-    }
-    const radioSeleccionado = Array.from(radios).find((r) => r.checked);
-    if (!radioSeleccionado) {
-      alert("Seleccioná un plato para continuar.");
-      return;
-    }
-
-    // Validaciones: solo permitir pedido para “hoy”
-    const diaMostrado =
-      document.querySelector(".realizar_pedido_container_dias_dia:focus")
-        ?.dataset.dia || nombreDiaHoy; // fallback: si no quedó focus, tomamos hoy
-
-    if (diaMostrado !== nombreDiaHoy) {
-      alert("Solo se pueden realizar pedidos para el día de hoy.");
-      return;
-    }
-    if (esFeriadoHoy) {
-      alert("Hoy es feriado. No se toman pedidos.");
-      return;
-    }
-    if (!asisteHoy) {
-      alert("Hoy no es uno de tus días de asistencia.");
-      return;
-    }
-    if (!dentroDeHorario) {
-      alert(
-        `Cerrado. El horario límite (${config.horario_limite_pedidos}) ya pasó.`
-      );
-      return;
-    }
-
-    // Duplicado de pedido
-    const pedidosLocales = leerPedidosLocales();
-    const pedidosFusionados = fusionarPedidos(pedidosJSON, pedidosLocales);
-    if (existePedidoHoy(pedidosFusionados, datosUsuario.id, fechaHoyISO)) {
-      alert("Ya realizaste tu pedido hoy.");
-      return;
-    }
-
-    // Crear y guardar pedido local
-    const nuevoPedido = {
-      id: crearIdPedido(),
-      usuario_id: datosUsuario.id,
-      fecha: fechaHoyISO,
-      platos: radioSeleccionado.value,
-    };
-    pedidosLocales.push(nuevoPedido);
-    guardarPedidosLocales(pedidosLocales);
-
-    alert(`Pedido confirmado: ${nuevoPedido.platos} para ${fechaHoyISO}`);
-  });
 }
-
-//Busca el href configuracion y lo oculta si no se es admin
-document.addEventListener("DOMContentLoaded", () => {
-  const user = getUsuarioActivo();
-  const configLink = document.querySelector(
-    '.sidebar a[href="adm-configuracion.html"]'
-  );
-  if (configLink && (!user || user.rol !== "administrador")) {
-    const item = configLink.closest(".sidebar_lista_item");
-    if (item) item.style.display = "none";
-  }
-});
 
 init();

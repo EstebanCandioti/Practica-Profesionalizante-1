@@ -1,0 +1,25 @@
+.cantidad-control{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  margin: 14px 0;
+}
+.cant-btn{
+  width:42px;
+  height:42px;
+  border-radius:10px;
+  border:1px solid #bbb;
+  background:#fff;
+  font-size:22px;
+  cursor:pointer;
+}
+.cant-input{
+  width:70px;
+  height:42px;
+  text-align:center;
+  border-radius:10px;
+  border:1px solid #bbb;
+  background:#fff;
+  pointer-events: none;
+}
