@@ -49,7 +49,7 @@ function renderNotificaciones(lista){
 
     card.innerHTML = `
       <div class="noti_head">
-        <h3 class="noti_asunto">${asunto}</h3>
+        <h3 class="noti_asunto" style="font-weight: 700;"">${asunto}</h3>
         <div class="noti_fecha">${fecha}</div>
       </div>
       <p class="noti_mensaje">${mensaje}</p>

@@ -19,8 +19,68 @@
   <link rel="stylesheet" href="css/historial-pedidos/historial-pedidos-container-cartas-estado.css">
   <link rel="stylesheet" href="css/body.css">
   <link rel="stylesheet" href="css/sidebar/sidebar.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-  <script src="script.js"></script>
+  <link rel="stylesheet" href="css/modales/banner-alerta.css">
+  <link rel="stylesheet" href="css/modales/modal-confirmacion.css">
+  <style>
+    /* Estilos para estados de pedidos */
+    .estado-confirmado {
+      color: #28a745;
+      font-weight: 600;
+    }
+    .estado-pendiente {
+      color: #ffc107;
+      font-weight: 600;
+    }
+    .estado-cancelado {
+      color: #dc3545;
+      font-weight: 600;
+    }
+    .mensaje-vacio {
+      text-align: center;
+      padding: 40px 20px;
+      color: #666;
+      font-size: 1.1rem;
+    }
+    .mensaje-error {
+      text-align: center;
+      padding: 40px 20px;
+      color: #dc3545;
+      font-size: 1.1rem;
+    }
+    .cargando {
+      text-align: center;
+      padding: 40px 20px;
+      color: #666;
+      font-size: 1.1rem;
+    }
+    
+    /* Contenedor scrolleable para la lista de pedidos */
+    #lista-historial {
+      max-height: calc(100vh - 200px); /* Altura maxima: viewport menos header/titulo */
+      overflow-y: auto; /* Scroll vertical cuando excede la altura */
+      overflow-x: hidden; /* No scroll horizontal */
+      padding-right: 8px; /* Espacio para la scrollbar */
+    }
+    
+    /* Estilo de la scrollbar (navegadores webkit) */
+    #lista-historial::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    #lista-historial::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 4px;
+    }
+    
+    #lista-historial::-webkit-scrollbar-thumb {
+      background: #888;
+      border-radius: 4px;
+    }
+    
+    #lista-historial::-webkit-scrollbar-thumb:hover {
+      background: #555;
+    }
+  </style>
 </head>
 
 <body>
@@ -40,30 +100,34 @@
   <div class="body">
     <aside class="sidebar">
       <ul class="sidebar_lista">
-        <!-- El contenido se genera dinámicamente desde sidebar.js -->
+        <!-- El contenido se genera dinamicamente desde sidebar.js -->
       </ul>
     </aside>
     <section class="w3-container historial-pedidos-container">
       <h1 class="historial-pedidos-container-titulo">Historial de Pedidos</h1>
-      <div class="historial-pedidos-container-cartas">
-        <p class="historial-pedidos-container-cartas-letras">lunes 25/06/2025</p>
-        <p class="historial-pedidos-container-cartas-letras">milanesa napolitana</p>
-        <p class="historial-pedidos-container-cartas-estado">confirmado</p>
-      </div>
-      <div class="historial-pedidos-container-cartas">
-        <p class="historial-pedidos-container-cartas-letras">viernes 22/06/2025</p>
-        <p class="historial-pedidos-container-cartas-letras">pizza especial</p>
-        <p class="historial-pedidos-container-cartas-estado">confirmado</p>
-      </div>
-      <div class="historial-pedidos-container-cartas">
-        <p class="historial-pedidos-container-cartas-letras">jueves 21/06/2025</p>
-        <p class="historial-pedidos-container-cartas-letras">tarta de jamon y queso</p>
-        <p class="historial-pedidos-container-cartas-estado">confirmado</p>
+      <div id="lista-historial">
+        <p class="cargando">Cargando historial...</p>
       </div>
     </section>
   </div>
+
+  <!-- Modal de confirmacion -->
+  <div class="modal-confirmacion" id="modal-confirmacion">
+    <div class="modal-confirmacion_backdrop" onclick="cerrarModal()"></div>
+    <div class="modal-confirmacion_dialog">
+      <div class="modal-confirmacion_header">
+        <h2 class="modal-confirmacion_titulo" id="modal-titulo">Titulo</h2>
+      </div>
+      <p class="modal-confirmacion_mensaje" id="modal-mensaje">Mensaje</p>
+      <div class="modal-confirmacion_footer">
+        <button class="modal-confirmacion_btn" id="modal-btn" onclick="cerrarModal()">Aceptar</button>
+      </div>
+    </div>
+  </div>
+
   <script type="module" src="/js/header.js"></script>
   <script type="module" src="/js/sidebar.js"></script>
+  <script type="module" src="/js/historial-pedidos.js"></script>
 </body>
 
 </html>

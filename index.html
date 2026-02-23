@@ -20,6 +20,57 @@
   <link rel="stylesheet" href="css/home/home_cartas_carta_titulo.css" />
   <link rel="stylesheet" href="css/body.css" />
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+  <style>
+    /* Estilo para cartas de accesos rapidos del admin */
+    .home_cartas_carta--admin {
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .home_cartas_carta--admin:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    /* Estilos para tarjetas clickeables de empleados */
+    #carta-asistencia,
+    #carta-ultimo-pedido,
+    #carta-notificaciones {
+      position: relative;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    #carta-asistencia:hover,
+    #carta-ultimo-pedido:hover,
+    #carta-notificaciones:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    /* Badge de notificaciones no leidas */
+    .notificacion-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 12px;
+      height: 12px;
+      background-color: #dc3545;
+      border-radius: 50%;
+      border: 2px solid white;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      animation: pulse 2s infinite;
+    }
+    
+    /* Animacion sutil del badge */
+    @keyframes pulse {
+      0%, 100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0.7;
+      }
+    }
+  </style>
 </head>
 
 <body>
@@ -40,36 +91,49 @@
     <!-- Sidebar -->
     <aside class="sidebar">
       <ul class="sidebar_lista">
-        <!-- El contenido se genera dinámicamente desde sidebar.js -->
+        <!-- El contenido se genera dinamicamente desde sidebar.js -->
       </ul>
     </aside>
-    <section class="home_cartas">
+    <section class="home_cartas" id="home_cartas_container">
+      
+      <!-- Carta 3: Horario limite (todos) -->
       <div class="home_cartas_carta">
+        <img src="resources/alerta.png" alt="alerta" class="home_cartas_carta_icono" />
+        <h5 class="home_cartas_carta_titulo">Horario limite</h5>
+        <p id="home_horario_limite"></p>
+      </div>
+      
+      <!-- Carta 4: Aviso/Recordatorios (todos) -->
+      <div class="home_cartas_carta">
+        <img src="resources/atencion.png" alt="camp" class="home_cartas_carta_icono" />
+        <h5 class="home_cartas_carta_titulo">Aviso</h5>
+        <p id="home_aviso"></p>
+      </div>
+      
+      <!-- Carta 5: Notificaciones (todos) - CLICKEABLE CON BADGE -->
+      <div class="home_cartas_carta" id="carta-notificaciones" style="border: 3px solid #8a8989;">
+        <img src="resources/notificacion.png" alt="camp" class="home_cartas_carta_icono" />
+        <h5 class="home_cartas_carta_titulo">Notificaciones</h5>
+        <p id="home_notificacion"></p>
+        <!-- El badge se agrega dinamicamente por JS si hay notificaciones no leidas -->
+      </div>
+      
+            <!-- Carta 1: Dias de asistencia (solo empleados) - CLICKEABLE -->
+      <div class="home_cartas_carta" id="carta-asistencia">
         <img src="resources/calendario.png" alt="calendarios" class="home_cartas_carta_icono" />
         <h5 class="home_cartas_carta_titulo">Dias de asistencia</h5>
         <p id="home_asistencia"></p>
       </div>
-      <div class="home_cartas_carta">
+      
+      <!-- Carta 2: Ultimo pedido (solo empleados) - CLICKEABLE -->
+      <div class="home_cartas_carta" id="carta-ultimo-pedido">
         <img src="resources/reloj.png" alt="reloj" class="home_cartas_carta_icono" />
         <h5 class="home_cartas_carta_titulo">Ultimo pedido</h5>
         <p id="home_ultima_fecha"></p>
         <img src="resources/campanilla.png" alt="campanilla" class="home_cartas_carta_icono" />
         <p id="home_ultimo_plato"></p>
       </div>
-      <div class="home_cartas_carta">
-        <img src="resources/alerta.png" alt="alerta" class="home_cartas_carta_icono" />
-        <p id="home_horario_limite"></p>
-      </div>
-      <div class="home_cartas_carta">
-        <img src="resources/atencion.png" alt="camp" class="home_cartas_carta_icono" />
-        <h5 class="home_cartas_carta_titulo">Aviso</h5>
-        <p id="home_aviso"></p>
-      </div>
-      <div class="home_cartas_carta">
-        <img src="resources/notificacion.png" alt="camp" class="home_cartas_carta_icono" />
-        <h5 class="home_cartas_carta_titulo">Notificaciones</h5>
-        <p id="home_notificacion"></p>
-      </div>
+      <!-- Las cartas de accesos rapidos del admin se agregan dinamicamente por JS -->
     </section>
   </div>
   <script type="module" src="/js/index.js"></script>

@@ -17,6 +17,7 @@
   <link rel="stylesheet" href="/css/gestion-empleados/gestion_empleados_main_menu.css">
   <link rel="stylesheet" href="/css/gestion-empleados/gestion_empleados_main_menu_lista.css">
   <link rel="stylesheet" href="/css/gestion-empleados/gestion_empleados_main_menu_lista_item.css">
+  <link rel="stylesheet" href="/css/modales/modal-confirmacion.css">
 
 <body>
   <header>
@@ -50,6 +51,20 @@
       </div>
     </section>
   </div>
+
+  <!-- Modal de confirmacion -->
+<div class="modal-confirmacion" id="modal-confirmacion">
+  <div class="modal-confirmacion_backdrop" onclick="cerrarModal()"></div>
+  <div class="modal-confirmacion_dialog">
+    <div class="modal-confirmacion_header">
+      <h2 class="modal-confirmacion_titulo" id="modal-titulo">Titulo</h2>
+    </div>
+    <p class="modal-confirmacion_mensaje" id="modal-mensaje">Mensaje</p>
+    <div class="modal-confirmacion_footer">
+      <button class="modal-confirmacion_btn" id="modal-btn" onclick="cerrarModal()">Aceptar</button>
+    </div>
+  </div>
+</div>
 
   <script type="module" src="/js/header.js"></script>
   <script type="module" src="/js/gestionar-empleados.js"></script>

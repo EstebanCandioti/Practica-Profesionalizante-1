@@ -39,18 +39,17 @@ function renderPedidos(lista) {
   contenedor.innerHTML = "";
 
   for (const item of lista) {
-    item;
     console.log(item);
     const nodo = tpl.content.firstElementChild.cloneNode(true);
 
     setText(
       nodo.querySelector('[data-field="fechaEntrega"]'),
-      item.fechaEntrega
+      item.fechaEntrega,
     );
     setText(nodo.querySelector('[data-field="nombrePlato"]'), item.nombrePlato);
     setText(
       nodo.querySelector('[data-field="cantidadPersonas"]'),
-      item.cantidadPersonas
+      item.cantidadPersonas,
     );
     setText(nodo.querySelector('[data-field="estado"]'), item.estado);
 
@@ -69,20 +68,20 @@ function renderPedidos(lista) {
       abrirEdicion(item);
     });
 
-      btnCancelar.addEventListener("click", async () => {
-        const ok = confirm(
-          `¿Querés cancelar el pedido del ${item.fechaEntrega} (${item.nombrePlato})?`
-        );
-        if (!ok) return;
+    btnCancelar.addEventListener("click", async () => {
+      const ok = confirm(
+        `¿Querés cancelar el pedido del ${item.fechaEntrega} (${item.nombrePlato})?`,
+      );
+      if (!ok) return;
 
-        try {
-          await eliminarPedidoDia(item.idPedidoDia);
-          await cargarMisPendientes(); // refresca la lista
-        } catch (err) {
-          console.error(err);
-          alert(err.message || "No se pudo cancelar el pedido.");
-        }
-      });
+      try {
+        await eliminarPedidoDia(item.idPedidoDia);
+        await cargarMisPendientes(); // refresca la lista
+      } catch (err) {
+        console.error(err);
+        alert(err.message || "No se pudo cancelar el pedido.");
+      }
+    });
 
     contenedor.appendChild(nodo);
   }
@@ -93,25 +92,32 @@ async function cargarMisPendientes() {
   if (!usuario) return;
 
   const estado = document.getElementById("estado");
-  estado.textContent = "Cargando pedidos...";
+  estado.innerHTML = '<p style="text-align: center; padding: 20px;">Cargando...</p>';
 
   let lista = [];
   try {
     const todos = await getPedidosSemana(obtenerFechaActualISO(), 1);
     lista = (todos || []).filter(
-      (p) => p.idUsuario === Number(usuario.idUsuario) && p.estado === "Pendiente"
+      (p) =>
+        p.idUsuario === Number(usuario.idUsuario) && p.estado === "Pendiente",
     );
   } catch (err) {
     lista = [];
   }
 
   if (lista.length === 0) {
-    estado.textContent = "No tenés pedidos pendientes para la semana entrante.";
+    estado.innerHTML = `
+      <div class="mi-pedido-vacio">
+        <h3>No tenes pedidos pendientes</h3>
+        <p>para la semana entrante</p>
+        <button onclick="window.location.href='/realizar_pedido.html'">Realizar pedido</button>
+      </div>
+    `;
     renderPedidos([]);
     return;
   }
 
-  estado.textContent = "";
+  estado.innerHTML = "";
   renderPedidos(lista);
 }
 
@@ -199,7 +205,7 @@ async function guardarCambios() {
   const idMenuPlato = Number(select?.value);
 
   const mp = (menuPlatosDia || []).find(
-    (x) => Number(x.idMenuPlato) === idMenuPlato
+    (x) => Number(x.idMenuPlato) === idMenuPlato,
   );
 
   if (!mp) {
@@ -234,7 +240,7 @@ async function guardarCambios() {
     cerrarModal();
 
     // refrescar la pantalla correcta (pendientes / semana)
-    await cargarMisPendientes(); // <-- asegurate que esta función exista y sea la que renderiza la lista
+    await cargarMisPendientes();
   } catch (err) {
     console.error(err);
     modalMsg().textContent = err.message || "No se pudo actualizar el pedido.";

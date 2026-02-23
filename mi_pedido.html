@@ -16,6 +16,7 @@
   <link rel="stylesheet" href="css/mi_pedido/mi_pedido_boton_modal.css">
   <link rel="stylesheet" href="css/mi_pedido/mi_pedido_cartas.css">
   <link rel="stylesheet" href="css/mi_pedido/mi_pedido_cartas_carta.css">
+  <link rel="stylesheet" href="css/mi_pedido/mi_pedido_vacio.css">
 </head>
 
 <body>
@@ -36,13 +37,14 @@
   <div class="body">
     <aside class="sidebar">
       <ul class="sidebar_lista">
-        <!-- El contenido se genera dinámicamente desde sidebar.js -->
+        <!-- El contenido se genera dinamicamente desde sidebar.js -->
       </ul>
     </aside>
     <section class="w3-container container-fluid" style="padding: 18px; flex: 1;">
       <h1 style="margin-bottom: 12px; text-align: center;">Mis pedidos pendientes</h1>
 
-      <div id="estado" style="margin-bottom: 12px; opacity: .85;"></div>
+      <!-- Este div ahora se usa para el estado vacio -->
+      <div id="estado"></div>
 
       <div id="lista-pedidos" class="mi_pedido_cartas"></div>
 

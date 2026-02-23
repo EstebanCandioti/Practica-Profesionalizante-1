@@ -8,3 +8,32 @@
     background-color: rgb(138, 138, 138);
     transition: 0.5s;
 }
+
+/* IMPORTANTE: Todos los botones de dias deben tener el mismo borde SIEMPRE */
+.realizar_pedido_container_dias_dia {
+  border: 3px solid transparent !important; /* Borde transparente por defecto */
+  transition: all 0.2s ease;
+}
+
+/* Estilo para el dia seleccionado - SOLO cambia el COLOR, no el grosor */
+.dia-seleccionado {
+  background-color: #c2c2c2 !important;
+  border-color: #4d4d4d !important; /* Solo cambia el color, NO el grosor */
+  box-shadow: 0 2px 8px rgba(178, 178, 179, 0.3);
+}
+
+/* Opcional: estilo sin imagen para centrar contenido */
+.realizar_pedido_container_cartas_carta:not(:has(img)) {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding-top: 20px;
+}
+
+.realizar_pedido_container_cartas_carta:not(:has(img)) .realizar_pedido_container_cartas_carta_texto {
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-align: center;
+  margin-top: 0;
+}

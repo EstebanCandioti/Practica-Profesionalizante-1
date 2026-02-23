@@ -6,7 +6,7 @@ console.log("service.js cargado");
 const API_BASE_URL = "http://localhost:8080";
 
 // ------------------------
-// Helper genÃƒÂ©rico de fetch
+// Helper generico de fetch
 // ------------------------
 async function apiFetch(
   path,
@@ -60,8 +60,6 @@ export async function getUsuarios() {
 }
 
 export async function loginUsuario({ email, password, recordarSesion }) {
-  // Tu endpoint: @PostMapping("/login") dentro de UsuarioController
-  // asumiendo que el controller estÃƒÂ¡ en /api/usuarios
   const usuario = await apiFetch("/usuarios/login", {
     method: "POST",
     body: { email, password },
@@ -129,7 +127,7 @@ export async function modificarPlato(idPlato, payload) {
   });
 }
 
-// Eliminar (si existe DELETE)
+// Eliminar
 export async function cambiarEstadoPlato(idPlato) {
   return await apiFetch(`/plato/estado/${idPlato}`, {
     method: "DELETE",
@@ -278,6 +276,13 @@ export async function getPorPedido(idPedido) {
   return await apiFetch(`/pedido-dia/pedido/${idPedido}`);
 }
 
+
+// Obtener historial completo de PedidoDia (incluye activos e inactivos)
+export async function getPorPedidoHistorial(idPedido) {
+  return await apiFetch(`/pedido-dia/pedido/${idPedido}/historial`);
+}
+
+
 export async function actualizarPedidoDia(body) {
   return await apiFetch(`/pedido-dia`, {
     method: "PUT",
@@ -401,5 +406,79 @@ export async function actualizarFeriados(feriados) {
   return await apiFetch("/configuracion/feriados", {
     method: "PUT",
     body: feriados,
+  });
+}
+
+// ============================================
+// FUNCIONES HELPER PARA MODAL DE CONFIRMACION
+// ============================================
+
+export function mostrarModalExito(titulo, mensaje) {
+  const modal = document.getElementById("modal-confirmacion");
+  const tituloEl = document.getElementById("modal-titulo");
+  const mensajeEl = document.getElementById("modal-mensaje");
+  const btnEl = document.getElementById("modal-btn");
+  
+  if (!modal || !tituloEl || !mensajeEl || !btnEl) {
+    console.error("Elementos del modal no encontrados");
+    return;
+  }
+  
+  tituloEl.textContent = titulo;
+  mensajeEl.textContent = mensaje;
+  
+  tituloEl.className = "modal-confirmacion_titulo modal-confirmacion_titulo--exito";
+  btnEl.className = "modal-confirmacion_btn modal-confirmacion_btn--exito";
+  
+  modal.classList.add("show");
+}
+
+export function mostrarModalError(titulo, mensaje) {
+  const modal = document.getElementById("modal-confirmacion");
+  const tituloEl = document.getElementById("modal-titulo");
+  const mensajeEl = document.getElementById("modal-mensaje");
+  const btnEl = document.getElementById("modal-btn");
+  
+  if (!modal || !tituloEl || !mensajeEl || !btnEl) {
+    console.error("Elementos del modal no encontrados");
+    return;
+  }
+  
+  tituloEl.textContent = titulo;
+  mensajeEl.textContent = mensaje;
+  
+  tituloEl.className = "modal-confirmacion_titulo modal-confirmacion_titulo--error";
+  btnEl.className = "modal-confirmacion_btn modal-confirmacion_btn--error";
+  
+  modal.classList.add("show");
+}
+
+function cerrarModal() {
+  const modal = document.getElementById("modal-confirmacion");
+  if (modal) {
+    modal.classList.remove("show");
+  }
+}
+
+export function inicializarModalConfirmacion() {
+  const btnModal = document.getElementById("modal-btn");
+  const backdropModal = document.querySelector(".modal-confirmacion_backdrop");
+  
+  if (btnModal) {
+    btnModal.addEventListener("click", cerrarModal);
+  }
+  
+  if (backdropModal) {
+    backdropModal.addEventListener("click", cerrarModal);
+  }
+  
+  // Cerrar con tecla Escape
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      const modal = document.getElementById("modal-confirmacion");
+      if (modal && modal.classList.contains("show")) {
+        cerrarModal();
+      }
+    }
   });
 }

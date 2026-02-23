@@ -37,19 +37,16 @@
   <div class="body">
     <aside class="sidebar">
       <ul class="sidebar_lista">
-        <!-- El contenido se genera dinámicamente desde sidebar.js -->
+        <!-- El contenido se genera dinamicamente desde sidebar.js -->
       </ul>
     </aside>
 
     <!-- container configuracion -->
     <section class="adm-configuracion-container">
-      <a href="administrar_feriados.html" class="adm-configuracion-container-a"> configurar feriados </a>
-      <a href="/administrar_platos.html" class="adm-configuracion-container-a"> Administrar platos </a>
-      <a href="/adm-menu-dia.html" class="adm-configuracion-container-a">Configurar menus del dia</a>
-      <button class="adm-configuracion-container-boton" id="horario-limite"> configurar horario limite de pedidos
-      </button>
-      <a href="gestion-empleados.html" class="adm-configuracion-container-a"> gestionar empleados </a>
-      <a href="adm-pedido-semanal.html" class="adm-configuracion-container-a">ver pedidos semanales</a>
+      <h1 style="width: 100%; text-align: center; margin-bottom: 20px;">Configuracion</h1>
+      <button class="adm-configuracion-container-boton" id="horario-limite">Configurar horario limite de pedidos</button>
+      <a href="administrar_feriados.html" class="adm-configuracion-container-a">Configurar feriados</a>
+      <a href="gestion-empleados.html" class="adm-configuracion-container-a">Gestionar empleados</a>
     </section>
 
 
@@ -58,13 +55,13 @@
       <div class="horario_limite_backdrop" data-close></div>
       <div class="horario_limite_dialog" role="dialog" aria-modal="true" aria-labelledby="hl_titulo">
         <header class="horario_limite_header">
-          <h2 id="hl_titulo">Horario límite de pedidos</h2>
+          <h2 id="hl_titulo">Horario limite de pedidos</h2>
           <button class="horario_limite_close" title="Cerrar" data-close>x</button>
         </header>
 
         <form class="horario_limite_form" id="horario_limite_form" action="/config/horario-limite" method="post">
           <label class="hl_row">
-            <span>Hora límite diaria</span>
+            <span>Hora limite diaria</span>
             <input type="time" name="cutoff" required>
           </label>
 

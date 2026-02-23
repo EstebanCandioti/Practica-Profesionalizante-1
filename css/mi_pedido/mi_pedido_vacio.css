@@ -1,0 +1,48 @@
+#estado .mi-pedido-vacio,
+.mi-pedido-vacio {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 60px 20px !important;
+  text-align: center !important;
+  background: white !important;
+  border-radius: 8px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+  max-width: 500px !important;
+  margin: 40px auto !important;
+}
+
+.mi-pedido-vacio-icono {
+  font-size: 4rem !important;
+  margin-bottom: 20px !important;
+  opacity: 0.6 !important;
+}
+
+.mi-pedido-vacio h3 {
+  margin: 0 0 8px 0 !important;
+  font-size: 1.5rem !important;
+  color: #333 !important;
+  font-weight: 600 !important;
+}
+
+.mi-pedido-vacio p {
+  margin: 0 0 24px 0 !important;
+  color: #666 !important;
+  font-size: 1rem !important;
+}
+
+.mi-pedido-vacio button {
+  padding: 12px 32px !important;
+  background-color: #000000 !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 4px !important;
+  font-size: 1rem !important;
+  cursor: pointer !important;
+  transition: background-color 0.2s !important;
+}
+
+.mi-pedido-vacio button:hover {
+  background-color: rgb(63, 62, 62) !important;
+}

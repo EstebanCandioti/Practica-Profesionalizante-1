@@ -1,7 +1,80 @@
 import { requireAdmin, getUsuarios, cambiarEstadoUsuario } from "./servicio.js";
 
-// Agrega la función al servicio si aún no existe — ver nota al final del archivo
-// Endpoint real: PUT /usuarios/estado/{id}
+// ============================================
+// FUNCIONES HELPER PARA MODAL DE CONFIRMACION
+// ============================================
+
+function mostrarModalExito(titulo, mensaje) {
+  const modal = document.getElementById("modal-confirmacion");
+  const tituloEl = document.getElementById("modal-titulo");
+  const mensajeEl = document.getElementById("modal-mensaje");
+  const btnEl = document.getElementById("modal-btn");
+  
+  if (!modal || !tituloEl || !mensajeEl || !btnEl) {
+    console.error("Elementos del modal no encontrados");
+    return;
+  }
+  
+  tituloEl.textContent = titulo;
+  mensajeEl.textContent = mensaje;
+  
+  tituloEl.className = "modal-confirmacion_titulo modal-confirmacion_titulo--exito";
+  btnEl.className = "modal-confirmacion_btn modal-confirmacion_btn--exito";
+  
+  modal.classList.add("show");
+}
+
+function mostrarModalError(titulo, mensaje) {
+  const modal = document.getElementById("modal-confirmacion");
+  const tituloEl = document.getElementById("modal-titulo");
+  const mensajeEl = document.getElementById("modal-mensaje");
+  const btnEl = document.getElementById("modal-btn");
+  
+  if (!modal || !tituloEl || !mensajeEl || !btnEl) {
+    console.error("Elementos del modal no encontrados");
+    return;
+  }
+  
+  tituloEl.textContent = titulo;
+  mensajeEl.textContent = mensaje;
+  
+  tituloEl.className = "modal-confirmacion_titulo modal-confirmacion_titulo--error";
+  btnEl.className = "modal-confirmacion_btn modal-confirmacion_btn--error";
+  
+  modal.classList.add("show");
+}
+
+function cerrarModal() {
+  const modal = document.getElementById("modal-confirmacion");
+  if (modal) {
+    modal.classList.remove("show");
+  }
+}
+
+function inicializarModalConfirmacion() {
+  const btnModal = document.getElementById("modal-btn");
+  const backdropModal = document.querySelector(".modal-confirmacion_backdrop");
+  
+  if (btnModal) {
+    btnModal.addEventListener("click", cerrarModal);
+  }
+  
+  if (backdropModal) {
+    backdropModal.addEventListener("click", cerrarModal);
+  }
+  
+  // Cerrar con tecla Escape
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      const modal = document.getElementById("modal-confirmacion");
+      if (modal && modal.classList.contains("show")) {
+        cerrarModal();
+      }
+    }
+  });
+}
+
+// Agrega de aquí hacia arriba (antes de etiquetaRol)
 
 function etiquetaRol(esRestaurante) {
   return esRestaurante ? "Restaurante" : "Empleado";
@@ -45,7 +118,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       (u) => !u.es_usuario_restaurante && u.idUsuario !== adminActivo.idUsuario
     );
   } catch (err) {
-    ul.innerHTML = `<li style="padding:1rem;color:red;">Error al cargar empleados: ${err.message}</li>`;
+    ul.innerHTML = `<li style="padding:1rem;color:#555;">No se pudieron cargar los empleados.</li>`;
+    mostrarModalError("Error al cargar", `No se pudieron cargar los empleados: ${err.message}`);
     return;
   }
 
@@ -77,7 +151,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     e.target.textContent = "Guardando...";
 
     try {
-      await cambiarEstadoUsuario(id);
+    await cambiarEstadoUsuario(id);
 
       // Actualizar UI sin recargar la página
       const nuevoActivo = !estaActivo;
@@ -89,21 +163,17 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       e.target.textContent = nuevoActivo ? "Desactivar" : "Activar";
       e.target.className = `ge_toggle ${nuevoActivo ? "ge_toggle--desactivar" : "ge_toggle--activar"}`;
+      
+      // MODAL DE EXITO
+      const accionPasado = nuevoActivo ? "activado" : "desactivado";
+      mostrarModalExito("Cambios guardados", `El empleado fue ${accionPasado} correctamente`);
     } catch (err) {
-      alert(`No se pudo ${accion} el empleado: ${err.message}`);
+       mostrarModalError("Error al cambiar estado", `No se pudo ${accion} el empleado: ${err.message || "Intenta nuevamente"}`);
       e.target.textContent = estaActivo ? "Desactivar" : "Activar";
     } finally {
       e.target.disabled = false;
     }
   });
+  inicializarModalConfirmacion();
 });
 
-/*
-  NOTA — Agregar en servicio.js si no existe:
-
-  export async function cambiarEstadoUsuario(idUsuario) {
-    return await apiFetch(`/usuarios/estado/${idUsuario}`, {
-      method: "PUT",
-    });
-  }
-*/

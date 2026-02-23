@@ -57,9 +57,9 @@ const ITEMS_ADMIN = [
   },
   {
     icono: "/resources/configuracion.png",
-    texto: "Configuración",
+    texto: "Configuracion",
     href: "/adm-configuracion.html",
-    alt: "Configuración"
+    alt: "Configuracion"
   }
 ];
 

@@ -1,0 +1,93 @@
+/* MODAL DE CONFIRMACION ESTANDARIZADO */
+/* Usar en todos los modulos del sistema */
+
+.modal-confirmacion {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-confirmacion.show {
+  display: flex;
+}
+
+.modal-confirmacion_backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-confirmacion_dialog {
+  position: relative;
+  background: white;
+  border-radius: 8px;
+  padding: 24px;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.modal-confirmacion_header {
+  margin-bottom: 16px;
+}
+
+.modal-confirmacion_titulo {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.modal-confirmacion_titulo--exito {
+  color: #28a745;
+}
+
+.modal-confirmacion_titulo--error {
+  color: #dc3545;
+}
+
+.modal-confirmacion_mensaje {
+  margin: 0 0 24px 0;
+  color: #333;
+  line-height: 1.5;
+}
+
+.modal-confirmacion_footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.modal-confirmacion_btn {
+  padding: 10px 24px;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.modal-confirmacion_btn--exito {
+  background-color: #28a745;
+  color: white;
+}
+
+.modal-confirmacion_btn--exito:hover {
+  background-color: #218838;
+}
+
+.modal-confirmacion_btn--error {
+  background-color: #dc3545;
+  color: white;
+}
+
+.modal-confirmacion_btn--error:hover {
+  background-color: #c82333;
+}

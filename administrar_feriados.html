@@ -18,6 +18,8 @@
     <link rel="stylesheet" href="/css/administrar_feriados/feriados_dow.css">
     <link rel="stylesheet" href="/css/administrar_feriados/feriados_dias.css">
     <link rel="stylesheet" href="/css/administrar_feriados/feriados_guardar.css">
+    <link rel="stylesheet" href="css/modales/banner-alerta.css">
+    <link rel="stylesheet" href="css/modales/modal-confirmacion.css">
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css' rel='stylesheet' />
 </head>
 
@@ -47,6 +49,20 @@
             <div id="calendar"></div>
             <button id="feriados-guardar" class="feriados_boton">Guardar cambios</button>
         </section>
+    </div>
+
+    <!-- Modal de confirmacion -->
+    <div class="modal-confirmacion" id="modal-confirmacion">
+        <div class="modal-confirmacion_backdrop" onclick="cerrarModal()"></div>
+        <div class="modal-confirmacion_dialog">
+            <div class="modal-confirmacion_header">
+                <h2 class="modal-confirmacion_titulo" id="modal-titulo">Titulo</h2>
+            </div>
+            <p class="modal-confirmacion_mensaje" id="modal-mensaje">Mensaje</p>
+            <div class="modal-confirmacion_footer">
+                <button class="modal-confirmacion_btn" id="modal-btn" onclick="cerrarModal()">Aceptar</button>
+            </div>
+        </div>
     </div>
 
     <script type="module" src="/js/administrar_feriados.js"></script>

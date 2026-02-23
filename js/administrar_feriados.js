@@ -1,4 +1,4 @@
-import { requireAdmin, getConfiguracion, actualizarFeriados } from "./servicio.js";
+import { requireAdmin, getConfiguracion, actualizarFeriados, mostrarModalError, mostrarModalExito, inicializarModalConfirmacion } from "./servicio.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
   const admin = requireAdmin("./login.html");
@@ -75,12 +75,14 @@ document.addEventListener("DOMContentLoaded", async () => {
       // Actualizar la referencia original con el estado guardado
       feriadosOriginales = new Set(feriadosActuales);
 
-      alert("Feriados guardados correctamente.");
+      mostrarModalExito("Exito","Feriados guardados correctamente.");
     } catch (err) {
-      alert("Error al guardar los feriados: " + err.message);
+      mostrarModalError("Error","Error al guardar los feriados: " + err.message);
     } finally {
       botonGuardar.disabled = false;
       botonGuardar.textContent = "Guardar cambios";
     }
   });
+
+  inicializarModalConfirmacion();
 });

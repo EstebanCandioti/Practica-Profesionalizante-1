@@ -54,33 +54,64 @@ function normalizarDia(nombreDia) {
     .replace(/[\u0300-\u036f]/g, "");
 }
 
-// Oculta el link de configuracion si el usuario NO es admin del restaurante
-document.addEventListener("DOMContentLoaded", () => {
-  const user = getUsuarioActivo();
-  const configLink = document.querySelector(
-    '.sidebar a[href="adm-configuracion.html"]'
-  );
+// Crear tarjetas de accesos rapidos para admin
+function crearCartasAdmin() {
+  const container = document.getElementById("home_cartas_container");
+  if (!container) return;
 
-  const esUsuarioRestaurante = user && user.es_usuario_restaurante === true;
+  const accesos = [
+    {
+      icono: "/resources/platos.png",
+      titulo: "Administrar platos",
+      href: "/administrar_platos.html"
+    },
+    {
+      icono: "/resources/menu.png",
+      titulo: "Configurar menu del dia",
+      href: "/adm-menu-dia.html"
+    },
+    {
+      icono: "/resources/pedido.png",
+      titulo: "Ver pedidos semanales",
+      href: "/adm-pedido-semanal.html"
+    }
+  ];
 
-  if (configLink && !esUsuarioRestaurante) {
-    const item = configLink.closest(".sidebar_lista_item");
-    if (item) item.style.display = "none";
-  }
-});
+  accesos.forEach(acceso => {
+    const carta = document.createElement("div");
+    carta.className = "home_cartas_carta home_cartas_carta--admin";
+    carta.style.cursor = "pointer";
+    carta.style.border= "3px solid #8a8989"
+
+    carta.innerHTML = `
+      <img src="${acceso.icono}" alt="${acceso.titulo}" class="home_cartas_carta_icono" />
+      <h5 class="home_cartas_carta_titulo">${acceso.titulo}</h5>
+    `;
+    
+    carta.addEventListener("click", () => {
+      window.location.href = acceso.href;
+    });
+    
+    container.appendChild(carta);
+  });
+}
 
 async function init() {
   // 1) Requiere sesion (redirige a login si no hay)
   const usuarioActivo = requireAuth("./login.html");
   if (!usuarioActivo) return;
 
-  // 2) Carga usuarios, pedidos y configuracion desde el back en paralelo
-  const [usuariosRegistrados, pedidosRegistrados, config] = await Promise.all([
+  // Detectar si es admin
+  const esAdmin = usuarioActivo.es_usuario_restaurante === true;
+
+  // 2) Carga usuarios, pedidos, notificaciones y configuracion desde el back en paralelo
+  const [usuariosRegistrados, pedidosRegistrados, notificaciones, config] = await Promise.all([
     getUsuarios(),
-    cargarPedidosUsuarioSeguros(usuarioActivo.idUsuario),
+    esAdmin ? Promise.resolve([]) : cargarPedidosUsuarioSeguros(usuarioActivo.idUsuario), // Admin no necesita pedidos
+    getNotificacionesPorUsuario(usuarioActivo.idUsuario).catch(() => []),
     getConfiguracion().catch((err) => {
       console.error("No se pudo cargar la configuracion:", err);
-      return { horarioLimite: "10:30" }; // fallback por si el back no responde
+      return { horarioLimite: "10:30" };
     }),
   ]);
 
@@ -88,7 +119,9 @@ async function init() {
 
   console.log("Usuarios:", usuariosRegistrados);
   console.log("Pedidos:", pedidosRegistrados);
+  console.log("Notificaciones:", notificaciones);
   console.log("Horario limite:", HORA_LIMITE_PEDIDOS);
+  console.log("Es admin:", esAdmin);
 
   // 3) Usuario actual segun la DB
   const datosUsuario =
@@ -96,95 +129,122 @@ async function init() {
       (u) => u.idUsuario === usuarioActivo.idUsuario
     ) || usuarioActivo;
 
-  // 4) Carta: Dias de asistencia
-  const diasAsistencia = (datosUsuario.diasAsistencia || []).map((item) =>
-    normalizarDia(item.dia)
-  );
-  const diasAsistenciaTexto = diasAsistencia.join(", ");
-  setTexto(
-    "home_asistencia",
-    diasAsistenciaTexto || "Sin dias de asistencia configurados"
-  );
-
-  // 5) Carta: Ultimo pedido
-  const pedidosDelUsuario = (pedidosRegistrados || []).sort((a, b) => {
-    const fechaA = a.fechaPedido || a.fecha_pedido || "";
-    const fechaB = b.fechaPedido || b.fecha_pedido || "";
-    return fechaA < fechaB ? 1 : -1;
-  });
-
-  if (pedidosDelUsuario.length > 0) {
-    const ultimoPedido = pedidosDelUsuario[0];
-    const fechaUltimoPedido =
-      ultimoPedido.fechaPedido ||
-      ultimoPedido.fecha_pedido ||
-      ultimoPedido.fechaEntrega ||
-      ultimoPedido.fecha_entrega ||
-      "—";
-    const estadoUltimoPedido =
-      ultimoPedido.estado || ultimoPedido.estadoPedido || "";
-
-    setTexto("home_ultima_fecha", fechaUltimoPedido);
-    setTexto(
-      "home_ultimo_plato",
-      estadoUltimoPedido ? `Estado: ${estadoUltimoPedido}` : "Pedido realizado"
-    );
+  // 4) OCULTAR CARTAS PARA ADMIN
+  if (esAdmin) {
+    const cartaAsistencia = document.getElementById("carta-asistencia");
+    const cartaUltimoPedido = document.getElementById("carta-ultimo-pedido");
+    
+    if (cartaAsistencia) cartaAsistencia.style.display = "none";
+    if (cartaUltimoPedido) cartaUltimoPedido.style.display = "none";
   } else {
-    setTexto("home_ultima_fecha", "—");
-    setTexto("home_ultimo_plato", "Aun no realizaste pedidos");
+    const cartaAsistencia = document.getElementById("carta-asistencia");
+    cartaAsistencia.style.border="solid 3px #8a8989"
+    const cartaUltimoPedido = document.getElementById("carta-ultimo-pedido");
+    cartaUltimoPedido.style.border= "solid 3px #8a8989"
+    // 4) Carta: Dias de asistencia (SOLO EMPLEADOS)
+    const diasAsistencia = (datosUsuario.diasAsistencia || []).map((item) =>
+      normalizarDia(item.dia)
+    );
+    const diasAsistenciaTexto = diasAsistencia.join(", ");
+    setTexto(
+      "home_asistencia",
+      diasAsistenciaTexto || "Sin dias de asistencia configurados"
+    );
+
+    // 5) Carta: Ultimo pedido (SOLO EMPLEADOS)
+    const pedidosDelUsuario = (pedidosRegistrados || []).sort((a, b) => {
+      const fechaA = a.fechaPedido || a.fecha_pedido || "";
+      const fechaB = b.fechaPedido || b.fecha_pedido || "";
+      return fechaA < fechaB ? 1 : -1;
+    });
+
+    if (pedidosDelUsuario.length > 0) {
+      const ultimoPedido = pedidosDelUsuario[0];
+      const fechaUltimoPedido =
+        ultimoPedido.fechaPedido ||
+        ultimoPedido.fecha_pedido ||
+        ultimoPedido.fechaEntrega ||
+        ultimoPedido.fecha_entrega ||
+        "—";
+      const estadoUltimoPedido =
+        ultimoPedido.estado || ultimoPedido.estadoPedido || "";
+
+      setTexto("home_ultima_fecha", fechaUltimoPedido);
+      setTexto(
+        "home_ultimo_plato",
+        estadoUltimoPedido ? `Estado: ${estadoUltimoPedido}` : "Pedido realizado"
+      );
+    } else {
+      setTexto("home_ultima_fecha", "—");
+      setTexto("home_ultimo_plato", "Aun no realizaste pedidos");
+    }
+
+    // HACER TARJETAS CLICKEABLES SOLO PARA EMPLEADOS
+    
+    // Tarjeta "Dias de asistencia" -> Configurar asistencia
+    document.getElementById("carta-asistencia")?.addEventListener("click", () => {
+      window.location.href = "/configurar_asistencia.html";
+    });
+    
+    // Tarjeta "Ultimo pedido" -> Historial de pedidos
+    document.getElementById("carta-ultimo-pedido")?.addEventListener("click", () => {
+      window.location.href = "/historial-pedidos.html";
+    });
   }
 
-  // 6) Carta: Horario limite y aviso
+  // 6) Carta: Horario limite (TODOS)
   setTexto(
     "home_horario_limite",
     `El horario limite para pedir es ${HORA_LIMITE_PEDIDOS}`
   );
 
-  const nombreDiaHoy = normalizarDia(
-    new Date().toLocaleDateString("es-AR", { weekday: "long" })
-  );
+  // 7) Carta: Aviso - MOSTRAR RECORDATORIOS (TODOS)
+  const recordatorios = (notificaciones || [])
+    .filter(n => n.asunto && n.asunto.toLowerCase().includes("recordatorio"))
+    .sort((a, b) => {
+      const fechaA = new Date(a.fechaEnvio || 0);
+      const fechaB = new Date(b.fechaEnvio || 0);
+      return fechaB - fechaA; // Mas reciente primero
+    });
 
-  let mensajeAviso = "";
-
-  if (
-    !["lunes", "martes", "miercoles", "jueves", "viernes"].includes(nombreDiaHoy)
-  ) {
-    mensajeAviso = "Hoy no hay pedidos (fin de semana).";
-  } else if (!diasAsistencia.includes(nombreDiaHoy)) {
-    mensajeAviso = "Hoy no es uno de tus dias de asistencia.";
-  } else if (antesDeHorarioLimite(HORA_LIMITE_PEDIDOS)) {
-    mensajeAviso = `Estas a tiempo. Tenes hasta las ${HORA_LIMITE_PEDIDOS} para pedir.`;
+  if (recordatorios.length > 0) {
+    const ultimoRecordatorio = recordatorios[0];
+    setTexto("home_aviso", ultimoRecordatorio.mensaje || "Tienes recordatorios pendientes");
   } else {
-    mensajeAviso = `Cerrado. El horario limite de hoy (${HORA_LIMITE_PEDIDOS}) ya paso.`;
+    setTexto("home_aviso", "No tienes recordatorios pendientes");
   }
 
-  setTexto("home_aviso", mensajeAviso);
+  // 8) Carta: Notificaciones - Mostrar solo las NO LEIDAS (TODOS)
+  const noLeidas = (notificaciones || []).filter(n => n.leida === false);
+  
+  if (noLeidas.length === 0) {
+    setTexto("home_notificacion", "No tienes notificaciones nuevas");
+  } else {
+    const cantidad = noLeidas.length;
+    const textoNotif = cantidad === 1 
+      ? "Tienes 1 notificacion nueva" 
+      : `Tienes ${cantidad} notificaciones nuevas`;
+    setTexto("home_notificacion", textoNotif);
+  }
 
-  // 7) Carta: Notificaciones - Mostrar solo las NO LEIDAS
-  try {
-    const notificaciones = await getNotificacionesPorUsuario(usuarioActivo.idUsuario);
-    
-    // Filtrar solo las notificaciones no leidas
-    const noLeidas = (notificaciones || []).filter(n => n.leida === false);
-    
-    if (noLeidas.length === 0) {
-      setTexto("home_notificacion", "No tienes notificaciones nuevas");
-    } else {
-      // Mostrar la cantidad de notificaciones no leidas
-      const cantidad = noLeidas.length;
-      const textoNotif = cantidad === 1 
-        ? "Tienes 1 notificacion nueva" 
-        : `Tienes ${cantidad} notificaciones nuevas`;
-      setTexto("home_notificacion", textoNotif);
+  // 9) HACER TARJETA DE NOTIFICACIONES CLICKEABLE (TODOS)
+  const cartaNotificaciones = document.getElementById("carta-notificaciones");
+  if (cartaNotificaciones) {
+    cartaNotificaciones.addEventListener("click", () => {
+      window.location.href = "/notificaciones.html";
+    });
+
+    // 10) AGREGAR BADGE SI HAY NOTIFICACIONES NO LEIDAS
+    if (noLeidas.length > 0) {
+      const badge = document.createElement("span");
+      badge.className = "notificacion-badge";
+      cartaNotificaciones.appendChild(badge);
     }
-  } catch (err) {
-    // Si es 404, no hay notificaciones (no es error)
-    if (err.message.includes("404")) {
-      setTexto("home_notificacion", "No tienes notificaciones nuevas");
-    } else {
-      console.error("Error al cargar notificaciones:", err);
-      setTexto("home_notificacion", "No tienes notificaciones nuevas");
-    }
+  }
+
+  // 11) AGREGAR ACCESOS RAPIDOS PARA ADMIN
+  if (esAdmin) {
+    crearCartasAdmin();
   }
 }
 

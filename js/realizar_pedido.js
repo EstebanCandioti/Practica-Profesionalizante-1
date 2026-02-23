@@ -7,6 +7,9 @@ import {
   getMenusDiaPorSemana,
   getMenuPlatosPorFecha,
   getPedidosPorUsuario,
+  mostrarModalError,
+  mostrarModalExito,
+  inicializarModalConfirmacion,
 } from "./servicio.js";
 
 let fechaSeleccionadaISO = null;
@@ -102,11 +105,12 @@ function obtenerSemanaEntranteISO() {
 }
 
 function renderMenuPlatos(menuPlatos, contenedorCartas) {
-  contenedorCartas.innerHTML = "";
-  if (!Array.isArray(menuPlatos) || menuPlatos.length === 0) {
-    /* ... */ return;
+  if (!menuPlatos || menuPlatos.length === 0) {
+    contenedorCartas.innerHTML = `<p style="padding:12px">No hay platos disponibles para este día.</p>`;
+    return;
   }
 
+  contenedorCartas.innerHTML = "";
   const fragmento = document.createDocumentFragment();
 
   menuPlatos.forEach((menuPlato, indice) => {
@@ -115,14 +119,19 @@ function renderMenuPlatos(menuPlatos, contenedorCartas) {
     console.log("menuPlato.plato:", menuPlato.plato);
     const idPlato = plato.id_plato;
     const nombre = plato?.nombre ?? "(sin nombre)";
-    const imagen = plato?.imagen ? plato.imagen : "/resources/milanesa.jpg";
     const stock = menuPlato.stockDisponible ?? 0;
     const idMenuDia = menuPlato.menuDia.idMenuDia;
 
+    // MEJORA 1: Solo usar imagen si existe y no esta vacia
+    const tieneImagen = plato?.imagen && plato.imagen.trim() !== "";
+    const imagen = tieneImagen ? plato.imagen : null;
+
     const carta = document.createElement("div");
     carta.className = "realizar_pedido_container_cartas_carta col-3";
+
+    // MEJORA 1: Solo incluir <img> si hay imagen
     carta.innerHTML = `
-      <img src="${imagen}" alt="${nombre}" class="realizar_pedido_container_cartas_carta_foto" />
+      ${imagen ? `<img src="${imagen}" alt="${nombre}" class="realizar_pedido_container_cartas_carta_foto" />` : ""}
       <p class="realizar_pedido_container_cartas_carta_texto">${nombre}</p>
       <p style="margin:0; opacity:.8;">Stock: ${stock}</p>
       <input
@@ -198,7 +207,7 @@ async function onRealizarPedidoClick() {
 
     const seleccionado = document.querySelector('input[name="menu"]:checked');
     if (!seleccionado) {
-      setMensaje("Selecciona un plato para el día", false);
+      mostrarModalError("Error", "Seleccione un plato para el dia");
       return;
     }
 
@@ -209,12 +218,15 @@ async function onRealizarPedidoClick() {
     );
 
     if (!Number.isFinite(idPlatoSeleccionado) || !Number.isFinite(idMenuDia)) {
-      setMensaje("No se pudo determinar el plato o el menú del día.", false);
+      mostrarModalError(
+        "Error",
+        "No se pudo determinar el plato o menu que quiere seleccionar"
+      );
       return;
     }
 
     if (!diaSeleccionado) {
-      setMensaje("Selecciona un día para realizar el pedido", false);
+      mostrarModalError("Error", "Seleccione un dia para realizar el pedido");
       return;
     }
 
@@ -245,7 +257,10 @@ async function onRealizarPedidoClick() {
 
       if (pedidosDelDia.length === 0) {
         console.error("Pedidos usuario:", pedidosUsuario);
-        setMensaje("Se creó el pedido pero no se pudo recuperar su ID.", false);
+        mostrarModalError(
+          "Error",
+          "Se creó el pedido pero no se pudo recuperar su ID.",
+        );
         return;
       }
 
@@ -262,18 +277,15 @@ async function onRealizarPedidoClick() {
         fechaEntrega: diaSeleccionado,
       });
 
-      setMensaje("Pedido creado correctamente", true);
+      mostrarModalExito("Exito", "Pedido creado correctamente");
       return;
     }
-    setMensaje(
-      "Ya existe un pedido para ese día.",
-      false,
-    );
+    mostrarModalError("Error", "Ya existe un pedido para ese dia");
   } catch (error) {
     console.error("Error al realizar el pedido", error);
-    setMensaje(
-      "Hubo un error al realizar el pedido. Intenta nuevamente.",
-      false,
+    mostrarModalError(
+      "Error",
+      "Hubo un error al realizar el pedido, intentelo nuevamente"
     );
   }
 }
@@ -312,6 +324,12 @@ async function init() {
     boton.disabled = !diasAsistenciaNormalizados.includes(diaNormalizado);
 
     boton.addEventListener("click", () => {
+      // MEJORA 2: Remover clase de todos los botones
+      botonesDias.forEach((b) => b.classList.remove("dia-seleccionado"));
+
+      // MEJORA 2: Agregar clase solo al boton clickeado
+      boton.classList.add("dia-seleccionado");
+
       cargarYMostrarDia(diaNormalizado, fechasSemanaEntrante, contenedorCartas);
     });
   });
@@ -326,6 +344,7 @@ async function init() {
   } else {
     contenedorCartas.innerHTML = `<p style="padding:12px">No tenés días de asistencia configurados.</p>`;
   }
+  inicializarModalConfirmacion();
 }
 
 init();

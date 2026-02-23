@@ -22,6 +22,8 @@
     <link rel="stylesheet" href="/css/administrar_platos/administrar_platos_main_platos_lista_item_checkbox.css">
     <link rel="stylesheet" href="/css/administrar_platos/administrar_platos_modales.css">
     <link rel="stylesheet" href="/css/administrar_platos/administrar_platos_main_lista_item_dias.css">
+    <link rel="stylesheet" href="css/modales/modal-confirmacion.css">
+    <link rel="stylesheet" href="css/modales/banner-alerta.css">
 </head>
 
 <body>
@@ -166,7 +168,18 @@
             </form>
         </div>
     </div>
-
+    <div class="modal-confirmacion" id="modal-confirmacion">
+        <div class="modal-confirmacion_backdrop" onclick="cerrarModal()"></div>
+        <div class="modal-confirmacion_dialog">
+            <div class="modal-confirmacion_header">
+                <h2 class="modal-confirmacion_titulo" id="modal-titulo">Titulo</h2>
+            </div>
+            <p class="modal-confirmacion_mensaje" id="modal-mensaje">Mensaje</p>
+            <div class="modal-confirmacion_footer">
+                <button class="modal-confirmacion_btn" id="modal-btn" onclick="cerrarModal()">Aceptar</button>
+            </div>
+        </div>
+    </div>
     <script type="module" src="/js/administrar_platos.js"></script>
     <script type="module" src="/js/header.js"></script>
     <script type="module" src="/js/sidebar.js"></script>
