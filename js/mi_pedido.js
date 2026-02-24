@@ -15,7 +15,6 @@ if (!usuario) {
 
 let menuPlatosDia = [];
 let pedidoDiaActual = null;
-const inputCantidad = () => document.getElementById("input-cantidad");
 const modalMsg = () => document.getElementById("modal-msg");
 const modal = () => document.getElementById("modal-editar");
 const selectPlato = () => document.getElementById("select-plato");
@@ -47,10 +46,6 @@ function renderPedidos(lista) {
       item.fechaEntrega,
     );
     setText(nodo.querySelector('[data-field="nombrePlato"]'), item.nombrePlato);
-    setText(
-      nodo.querySelector('[data-field="cantidadPersonas"]'),
-      item.cantidadPersonas,
-    );
     setText(nodo.querySelector('[data-field="estado"]'), item.estado);
 
     // Guardamos IDs como data-attributes (para que los botones sepan qué item son)
@@ -170,8 +165,6 @@ async function abrirEdicion(item) {
   // Guardamos el item que se está editando (si lo necesitás luego en guardarCambios)
   pedidoDiaActual = item;
 
-  inputCantidad().value = String(item.cantidadPersonas ?? 1);
-
   llenarSelectPlatos(); // usa pedidoDiaActual para preseleccionar plato
   abrirModal();
 }
@@ -194,12 +187,7 @@ function actualizarTextoStock() {
 async function guardarCambios() {
   modalMsg().textContent = "";
 
-  const cantidad = Number(inputCantidad().value);
-  if (!Number.isInteger(cantidad) || cantidad < 1) {
-    modalMsg().textContent =
-      "La cantidad debe ser un número mayor o igual a 1.";
-    return;
-  }
+  const cantidad = 1;
 
   const select = selectPlato();
   const idMenuPlato = Number(select?.value);
@@ -234,7 +222,7 @@ async function guardarCambios() {
     // opcional: mantener estado local coherente
     pedidoDiaActual.idPlato = mp.plato.id_plato;
     pedidoDiaActual.idMenuDia = mp.menuDia.idMenuDia;
-    pedidoDiaActual.cantidadPersonas = cantidad;
+    pedidoDiaActual.cantidadPersonas = 1;
     pedidoDiaActual.nombrePlato = mp.plato.nombre;
 
     cerrarModal();

@@ -10,21 +10,12 @@ import {
   mostrarModalError,
   mostrarModalExito,
   inicializarModalConfirmacion,
+  getConfiguracion,
 } from "./servicio.js";
 
 let fechaSeleccionadaISO = null;
 let menuDiaActual = null; // el MenuDia encontrado para esa fecha
 let pedidoSemanaCache = null; // para saber si ya hay pedido ese día
-
-document.getElementById("btn-cant-mas")?.addEventListener("click", () => {
-  const input = document.getElementById("cantidad_personas");
-  input.value = String(Math.max(1, Number(input.value || 1) + 1));
-});
-
-document.getElementById("btn-cant-menos")?.addEventListener("click", () => {
-  const input = document.getElementById("cantidad_personas");
-  input.value = String(Math.max(1, Number(input.value || 1) - 1));
-});
 
 function setMensaje(texto, ok = true) {
   const modal = document.getElementById("modal-mensaje");
@@ -213,14 +204,12 @@ async function onRealizarPedidoClick() {
 
     const idPlatoSeleccionado = Number(seleccionado.dataset.idPlato);
     const idMenuDia = Number(seleccionado.dataset.idMenuDia);
-    const cantidadPersonas = Number(
-      document.getElementById("cantidad_personas")?.value || 1,
-    );
+    const cantidadPersonas = 1; // Siempre 1 plato por persona
 
     if (!Number.isFinite(idPlatoSeleccionado) || !Number.isFinite(idMenuDia)) {
       mostrarModalError(
         "Error",
-        "No se pudo determinar el plato o menu que quiere seleccionar"
+        "No se pudo determinar el plato o menu que quiere seleccionar",
       );
       return;
     }
@@ -242,7 +231,7 @@ async function onRealizarPedidoClick() {
       await crearPedido({
         idUsuario: getUsuarioActivo().idUsuario,
         fecha_pedido: diaSeleccionado,
-        cantidad_personas: cantidadPersonas,
+        cantidad_personas: 1, // Siempre 1
         estado: "Pendiente",
       });
 
@@ -285,7 +274,7 @@ async function onRealizarPedidoClick() {
     console.error("Error al realizar el pedido", error);
     mostrarModalError(
       "Error",
-      "Hubo un error al realizar el pedido, intentelo nuevamente"
+      "Hubo un error al realizar el pedido, intentelo nuevamente",
     );
   }
 }
@@ -296,6 +285,20 @@ document
   .addEventListener("click", onRealizarPedidoClick);
 
 async function init() {
+  let config = null;
+  try {
+    config = await getConfiguracion();
+  } catch (error) {
+    console.error("Error al obtener configuración:", error);
+    // Continuar sin validaciones si falla
+  }
+
+  // Verificar horario límite (solo si es viernes)
+  if (config && verificarHorarioLimite(config.horarioLimite)) {
+    bloquearPorHorario(config.horarioLimite);
+    return; // Detener carga si está fuera de horario
+  }
+
   const usuarioActivo = requireAuth("./login.html");
   if (!usuarioActivo) return;
 
@@ -318,17 +321,31 @@ async function init() {
   if (!contenedorCartas) return;
 
   // seteo dataset + disabled según asistencia
-  botonesDias.forEach((boton) => {
+  botonesDias.forEach((boton, index) => {
     const diaNormalizado = normalizarDia(boton.textContent.trim());
     boton.dataset.dia = diaNormalizado;
     boton.disabled = !diasAsistenciaNormalizados.includes(diaNormalizado);
 
-    boton.addEventListener("click", () => {
-      // MEJORA 2: Remover clase de todos los botones
-      botonesDias.forEach((b) => b.classList.remove("dia-seleccionado"));
+    const fechaBoton = fechasSemanaEntrante[diaNormalizado];
+    // AGREGAR VALIDACION DE FERIADOS
+    // Verificar si es feriado
+    if (config && config.feriados && fechaBoton) {
+      if (esFeriado(fechaBoton, config.feriados)) {
+        marcarDiaFeriado(boton, fechaBoton);
+      }
+    }
 
-      // MEJORA 2: Agregar clase solo al boton clickeado
-      boton.classList.add("dia-seleccionado");
+    boton.addEventListener("click", () => {
+      // AGREGAR VALIDACION AL HACER CLICK
+      // Verificar si es feriado
+      if (boton.classList.contains("dia-feriado")) {
+        const fecha = fechasSemanaEntrante[diaNormalizado];
+        mostrarModalError(
+          "Día feriado",
+          `No se pueden realizar pedidos para el ${fecha} porque es feriado.`,
+        );
+        return;
+      }
 
       cargarYMostrarDia(diaNormalizado, fechasSemanaEntrante, contenedorCartas);
     });
@@ -345,6 +362,83 @@ async function init() {
     contenedorCartas.innerHTML = `<p style="padding:12px">No tenés días de asistencia configurados.</p>`;
   }
   inicializarModalConfirmacion();
+}
+
+function verificarHorarioLimite(horarioLimite) {
+  const ahora = new Date();
+  const horaActual = ahora.getHours() * 60 + ahora.getMinutes();
+  const [horas, minutos] = horarioLimite.split(":");
+  const horarioLimiteMinutos = parseInt(horas) * 60 + parseInt(minutos);
+
+  // Bloquear si ya pasó el horario límite HOY
+  return horaActual >= horarioLimiteMinutos;
+}
+
+/**
+ * Verifica si una fecha es feriado
+ */
+function esFeriado(fechaISO, feriados) {
+  if (!Array.isArray(feriados)) return false;
+  return feriados.includes(fechaISO);
+}
+
+/**
+ * Bloquea la página si ya pasó el horario límite
+ */
+function bloquearPorHorario(horarioLimite) {
+  // Deshabilitar todos los botones de días
+  const botonesDias = document.querySelectorAll(
+    ".realizar_pedido_container_dias_dia",
+  );
+  botonesDias.forEach((btn) => {
+    btn.disabled = true;
+    btn.style.opacity = "0.5";
+    btn.style.cursor = "not-allowed";
+  });
+
+  // Deshabilitar botón "Realizar pedido"
+  const btnRealizarPedido = document.getElementById("btn-realizar-pedido");
+  if (btnRealizarPedido) {
+    btnRealizarPedido.disabled = true;
+    btnRealizarPedido.style.opacity = "0.5";
+  }
+
+  // Mostrar mensaje
+  const contenedorTitulo = document.querySelector(
+    ".realizar_pedido_container_titulo",
+  );
+  if (contenedorTitulo) {
+    const mensaje = document.createElement("div");
+    mensaje.style.cssText = `
+      background-color: #f8d7da;
+      border: 1px solid #dc3545;
+      border-radius: 4px;
+      padding: 12px 20px;
+      margin-top: 16px;
+      color: #721c24;
+      font-size: 1rem;
+    `;
+    mensaje.innerHTML = `
+      <strong>⏰ Horario cerrado</strong><br>
+      El horario para realizar pedidos cierra todos los días a las ${horarioLimite}.
+      Volvé mañana antes de las ${horarioLimite} para realizar tu pedido.
+    `;
+    contenedorTitulo.appendChild(mensaje);
+  }
+}
+
+/**
+ * Marca un botón de día como feriado
+ */
+function marcarDiaFeriado(boton, fecha) {
+  boton.classList.add("dia-feriado");
+  boton.title = `Feriado - No se pueden realizar pedidos`;
+
+  // Agregar texto "Feriado" al botón
+  const spanTexto = boton.querySelector("span");
+  if (spanTexto) {
+    spanTexto.innerHTML += "<br><small>🚫 Feriado</small>";
+  }
 }
 
 init();

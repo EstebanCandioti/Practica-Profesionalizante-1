@@ -10,7 +10,7 @@ const API_BASE_URL = "http://localhost:8080";
 // ------------------------
 async function apiFetch(
   path,
-  { method = "GET", headers = {}, body = null } = {}
+  { method = "GET", headers = {}, body = null } = {},
 ) {
   const options = {
     method,
@@ -20,6 +20,13 @@ async function apiFetch(
     },
   };
 
+  // Agregar token JWT si existe
+  const token =
+    localStorage.getItem("authToken") || sessionStorage.getItem("authToken");
+  if (token) {
+    options.headers["Authorization"] = `Bearer ${token}`;
+  }
+
   if (body !== null && body !== undefined) {
     options.body = JSON.stringify(body);
   }
@@ -28,21 +35,94 @@ async function apiFetch(
 
   const responseText = await response.text().catch(() => "");
 
+  // Manejar 401 (token expirado)
+  if (response.status === 401) {
+    console.warn("Token expirado o invalido. Redirigiendo a login...");
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("usuarioActivo");
+    sessionStorage.removeItem("authToken");
+    sessionStorage.removeItem("usuarioActivo");
+    window.location.href = "/login.html";
+    return;
+  }
+
   if (!response.ok) {
     console.error("Error en apiFetch", {
       url: API_BASE_URL + path,
       status: response.status,
       body: responseText,
     });
-    // uso el mensaje del back si lo hay
     throw new Error(
-      responseText || `Error ${response.status} al llamar a ${path}`
+      responseText || `Error ${response.status} al llamar a ${path}`,
     );
   }
 
   if (!responseText) return null;
 
-  // Si viene JSON, lo parseo, si no, devuelvo texto
+  const contentType = response.headers.get("Content-Type") || "";
+  if (contentType.includes("application/json")) {
+    return JSON.parse(responseText);
+  }
+  return responseText;
+}
+
+// ------------------------
+// Helper para endpoints que pueden devolver 404
+// ------------------------
+async function apiFetchOptional(path, options = {}) {
+  const opts = {
+    method: options.method || "GET",
+    headers: {
+      "Content-Type": "application/json",
+      ...(options.headers || {}),
+    },
+  };
+
+  // Agregar token JWT si existe
+  const token =
+    localStorage.getItem("authToken") || sessionStorage.getItem("authToken");
+  if (token) {
+    opts.headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  if (options.body !== null && options.body !== undefined) {
+    opts.body = JSON.stringify(options.body);
+  }
+
+  const response = await fetch(API_BASE_URL + path, opts);
+
+  // Si es 404, devolver array vacío (sin datos, no es error)
+  if (response.status === 404) {
+    console.log(`Info: ${path} devolvió 404 (sin datos para este usuario)`);
+    return [];
+  }
+
+  // Manejar 401 (token expirado)
+  if (response.status === 401) {
+    console.warn("Token expirado o invalido. Redirigiendo a login...");
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("usuarioActivo");
+    sessionStorage.removeItem("authToken");
+    sessionStorage.removeItem("usuarioActivo");
+    window.location.href = "/login.html";
+    return;
+  }
+
+  const responseText = await response.text().catch(() => "");
+
+  if (!response.ok) {
+    console.error("Error en apiFetchOptional", {
+      url: API_BASE_URL + path,
+      status: response.status,
+      body: responseText,
+    });
+    throw new Error(
+      responseText || `Error ${response.status} al llamar a ${path}`,
+    );
+  }
+
+  if (!responseText) return null;
+
   const contentType = response.headers.get("Content-Type") || "";
   if (contentType.includes("application/json")) {
     return JSON.parse(responseText);
@@ -60,13 +140,18 @@ export async function getUsuarios() {
 }
 
 export async function loginUsuario({ email, password, recordarSesion }) {
-  const usuario = await apiFetch("/usuarios/login", {
+  // El backend ahora devuelve: { token, usuario }
+  const response = await apiFetch("/usuarios/login", {
     method: "POST",
     body: { email, password },
   });
 
-  // Guardamos el usuario en storage (sin tocar la respuesta)
+  // Extraer token y usuario de la respuesta
+  const { token, usuario } = response;
+
+  // Guardar token y usuario en el storage correspondiente
   const storage = recordarSesion ? localStorage : sessionStorage;
+  storage.setItem("authToken", token);
   storage.setItem("usuarioActivo", JSON.stringify(usuario));
 
   return usuario;
@@ -190,7 +275,7 @@ export async function getMenusDiaPorSemana(fechaReferenciaISO, offset = 1) {
 // Obtener menÃƒÂº-platos por fecha (MenuPlato)
 export async function getMenuPlatosPorFecha(fechaISO) {
   return await apiFetch(
-    `/menu-plato/fecha?fecha=${encodeURIComponent(fechaISO)}`
+    `/menu-plato/fecha?fecha=${encodeURIComponent(fechaISO)}`,
   );
 }
 
@@ -212,7 +297,7 @@ export async function eliminarPlatoDelMenu(idMenuPlato) {
 // =======================
 
 export async function getPedidosPorUsuario(idUsuario) {
-  return await apiFetch(`/pedidos/usuario/${idUsuario}`);
+  return await apiFetchOptional(`/pedidos/usuario/${idUsuario}`);
 }
 
 export async function crearPedido({
@@ -260,7 +345,6 @@ export async function confirmarSemanaPedidos(fechaReferencia, offset = 0) {
   });
 }
 
-
 // =======================
 //        PEDIDO-DIA
 // =======================
@@ -276,12 +360,10 @@ export async function getPorPedido(idPedido) {
   return await apiFetch(`/pedido-dia/pedido/${idPedido}`);
 }
 
-
 // Obtener historial completo de PedidoDia (incluye activos e inactivos)
 export async function getPorPedidoHistorial(idPedido) {
   return await apiFetch(`/pedido-dia/pedido/${idPedido}/historial`);
 }
-
 
 export async function actualizarPedidoDia(body) {
   return await apiFetch(`/pedido-dia`, {
@@ -297,7 +379,9 @@ export async function eliminarPedidoDia(idPedidoDia) {
 
   const idNumero = Number(idPedidoDia);
   if (!Number.isInteger(idNumero)) {
-    throw new Error(`eliminarPedidoDia: idPedidoDia invÃƒÂ¡lido (${idPedidoDia})`);
+    throw new Error(
+      `eliminarPedidoDia: idPedidoDia invÃƒÂ¡lido (${idPedidoDia})`,
+    );
   }
 
   return await apiFetch(`/pedido-dia/${idNumero}`, {
@@ -312,7 +396,7 @@ export async function getPedidosSemana(fechaReferenciaISO, offset = 0) {
   }).toString();
 
   try {
-    return await apiFetch(`/pedido-dia/semana?${query}`);
+    return await apiFetchOptional(`/pedido-dia/semana?${query}`);
   } catch (err) {
     const mensaje = String(err?.message || "");
     if (
@@ -331,7 +415,7 @@ export async function getPedidosSemana(fechaReferenciaISO, offset = 0) {
 // =======================
 
 export async function getNotificacionesPorUsuario(idUsuario) {
-  return await apiFetch(`/notificaciones/usuario/${idUsuario}`);
+  return await apiFetchOptional(`/notificaciones/usuario/${idUsuario}`);
 }
 
 // Marcar una notificacion como leida
@@ -343,9 +427,12 @@ export async function marcarNotificacionLeida(idNotificacion) {
 
 // Marcar todas las notificaciones de un usuario como leidas
 export async function marcarTodasNotificacionesLeidas(idUsuario) {
-  return await apiFetch(`/notificaciones/usuario/${idUsuario}/marcar-todas-leidas`, {
-    method: "PATCH",
-  });
+  return await apiFetch(
+    `/notificaciones/usuario/${idUsuario}/marcar-todas-leidas`,
+    {
+      method: "PATCH",
+    },
+  );
 }
 // =======================
 //      AUTENTICACION
@@ -368,8 +455,11 @@ export function requireAuth(loginUrl = "./login.html") {
 }
 
 export function logout(loginUrl = "./login.html") {
+  // Limpiar usuario Y token
   localStorage.removeItem("usuarioActivo");
+  localStorage.removeItem("authToken");
   sessionStorage.removeItem("usuarioActivo");
+  sessionStorage.removeItem("authToken");
   window.location.replace(loginUrl);
 }
 
@@ -418,18 +508,19 @@ export function mostrarModalExito(titulo, mensaje) {
   const tituloEl = document.getElementById("modal-titulo");
   const mensajeEl = document.getElementById("modal-mensaje");
   const btnEl = document.getElementById("modal-btn");
-  
+
   if (!modal || !tituloEl || !mensajeEl || !btnEl) {
     console.error("Elementos del modal no encontrados");
     return;
   }
-  
+
   tituloEl.textContent = titulo;
   mensajeEl.textContent = mensaje;
-  
-  tituloEl.className = "modal-confirmacion_titulo modal-confirmacion_titulo--exito";
+
+  tituloEl.className =
+    "modal-confirmacion_titulo modal-confirmacion_titulo--exito";
   btnEl.className = "modal-confirmacion_btn modal-confirmacion_btn--exito";
-  
+
   modal.classList.add("show");
 }
 
@@ -438,18 +529,19 @@ export function mostrarModalError(titulo, mensaje) {
   const tituloEl = document.getElementById("modal-titulo");
   const mensajeEl = document.getElementById("modal-mensaje");
   const btnEl = document.getElementById("modal-btn");
-  
+
   if (!modal || !tituloEl || !mensajeEl || !btnEl) {
     console.error("Elementos del modal no encontrados");
     return;
   }
-  
+
   tituloEl.textContent = titulo;
   mensajeEl.textContent = mensaje;
-  
-  tituloEl.className = "modal-confirmacion_titulo modal-confirmacion_titulo--error";
+
+  tituloEl.className =
+    "modal-confirmacion_titulo modal-confirmacion_titulo--error";
   btnEl.className = "modal-confirmacion_btn modal-confirmacion_btn--error";
-  
+
   modal.classList.add("show");
 }
 
@@ -463,15 +555,15 @@ function cerrarModal() {
 export function inicializarModalConfirmacion() {
   const btnModal = document.getElementById("modal-btn");
   const backdropModal = document.querySelector(".modal-confirmacion_backdrop");
-  
+
   if (btnModal) {
     btnModal.addEventListener("click", cerrarModal);
   }
-  
+
   if (backdropModal) {
     backdropModal.addEventListener("click", cerrarModal);
   }
-  
+
   // Cerrar con tecla Escape
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {

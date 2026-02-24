@@ -8,11 +8,42 @@ import {
   getPlatos,
   agregarPlatoAlMenu,
   getMenuPlatosPorFecha,
-  eliminarPlatoDelMenu
+  eliminarPlatoDelMenu,
+  getConfiguracion,
 } from "./servicio.js";
 
-console.log("adm-menu-dia cargo")
+console.log("adm-menu-dia cargo");
 let menuDiaActual = null;
+let configSistema = null;
+// ============================================
+// FUNCIONES HELPER PARA ALERT BANNER
+// ============================================
+
+function mostrarAlertBanner(mensaje, tipo) {
+  const banner = document.getElementById("alert-banner");
+  const mensajeEl = document.getElementById("alert-mensaje");
+
+  if (!banner || !mensajeEl) {
+    console.error("Elementos del alert banner no encontrados");
+    return;
+  }
+
+  mensajeEl.textContent = mensaje;
+  banner.className = `alert-banner alert-banner--${tipo}`;
+  banner.style.display = "block";
+
+  // Auto-ocultar despues de 5 segundos (opcional)
+  setTimeout(() => {
+    ocultarAlertBanner();
+  }, 5000);
+}
+
+function ocultarAlertBanner() {
+  const banner = document.getElementById("alert-banner");
+  if (banner) {
+    banner.style.display = "none";
+  }
+}
 
 /* =======================
    Utilidades generales
@@ -69,55 +100,52 @@ async function refrescarListaPlatosDelMenu() {
 
     contenedorLista.innerHTML = "";
 
-menuPlatos.forEach((menuPlato) => {
-  const nombrePlato = menuPlato?.plato?.nombre ?? "(sin nombre)";
-  const stockDisponible = menuPlato?.stockDisponible ?? 0;
-  const idMenuPlato = menuPlato.idMenuPlato;
+    menuPlatos.forEach((menuPlato) => {
+      const nombrePlato = menuPlato?.plato?.nombre ?? "(sin nombre)";
+      const stockDisponible = menuPlato?.stockDisponible ?? 0;
+      const idMenuPlato = menuPlato.idMenuPlato;
 
-  const fila = document.createElement("div");
-  fila.style.display = "flex";
-  fila.style.justifyContent = "space-between";
-  fila.style.alignItems = "center";
-  fila.style.padding = "8px 0";
-  fila.style.borderBottom = "1px solid rgba(0,0,0,.08)";
+      const fila = document.createElement("div");
+      fila.style.display = "flex";
+      fila.style.justifyContent = "space-between";
+      fila.style.alignItems = "center";
+      fila.style.padding = "8px 0";
+      fila.style.borderBottom = "1px solid rgba(0,0,0,.08)";
 
-  const info = document.createElement("div");
-  info.innerHTML = `<b>${nombrePlato}</b> — Stock: ${stockDisponible}`;
+      const info = document.createElement("div");
+      info.innerHTML = `<b>${nombrePlato}</b> — Stock: ${stockDisponible}`;
 
-  const botonEliminar = document.createElement("button");
-  botonEliminar.textContent = "✕";
-  botonEliminar.title = "Eliminar plato del menu";
-  botonEliminar.style.border = "none";
-  botonEliminar.style.background = "transparent";
-  botonEliminar.style.color = "red";
-  botonEliminar.style.fontSize = "16px";
-  botonEliminar.style.cursor = "pointer";
+      const botonEliminar = document.createElement("button");
+      botonEliminar.textContent = "✕";
+      botonEliminar.title = "Eliminar plato del menu";
+      botonEliminar.style.border = "none";
+      botonEliminar.style.background = "transparent";
+      botonEliminar.style.color = "red";
+      botonEliminar.style.fontSize = "16px";
+      botonEliminar.style.cursor = "pointer";
 
-  botonEliminar.addEventListener("click", async () => {
-    const confirmar = confirm(
-      `¿Eliminar "${nombrePlato}" del menu?`
-    );
-    if (!confirmar) return;
+      botonEliminar.addEventListener("click", async () => {
+        const confirmar = confirm(`¿Eliminar "${nombrePlato}" del menu?`);
+        if (!confirmar) return;
 
-    try {
-      await eliminarPlatoDelMenu(idMenuPlato);
-      mostrarMensaje("Plato eliminado correctamente.");
-      await refrescarListaPlatosDelMenu();
-    } catch (error) {
-      console.error(error);
-      mostrarMensaje("No se pudo eliminar el plato del menu.");
-    }
-  });
+        try {
+          await eliminarPlatoDelMenu(idMenuPlato);
+          mostrarAlertBanner("Plato eliminado correctamente.");
+          await refrescarListaPlatosDelMenu();
+        } catch (error) {
+          console.error(error);
+          mostrarAlertBanner("No se pudo eliminar el plato del menu.");
+        }
+      });
 
-  fila.appendChild(info);
-  fila.appendChild(botonEliminar);
-  contenedorLista.appendChild(fila);
-});
-
-
+      fila.appendChild(info);
+      fila.appendChild(botonEliminar);
+      contenedorLista.appendChild(fila);
+    });
   } catch (error) {
     console.error(error);
-    contenedorLista.innerHTML = "<p>No se pudieron cargar los platos del menu.</p>";
+    contenedorLista.innerHTML =
+      "<p>No se pudieron cargar los platos del menu.</p>";
   }
 }
 
@@ -129,11 +157,25 @@ async function buscarMenuPorFecha() {
   const fechaSeleccionada = obtenerValorInput("fecha");
 
   if (!fechaSeleccionada) {
-    mostrarMensaje("Debe seleccionar una fecha.");
+    mostrarAlertBanner("Debe seleccionar una fecha.");
     return;
   }
 
-  mostrarMensaje("Buscando menu...");
+  // Validar si es feriado
+  if (
+    configSistema &&
+    configSistema.feriados &&
+    configSistema.feriados.includes(fechaSeleccionada)
+  ) {
+    mostrarMensaje(
+      `⚠️ La fecha ${fechaSeleccionada} es feriado. No se puede crear menú para días feriados.`,
+    );
+    mostrarBloque("bloque-menu", false);
+    mostrarBloque("bloque-platos", false);
+    return;
+  }
+
+  mostrarAlertBanner("Buscando menu...");
   mostrarBloque("bloque-menu", false);
   mostrarBloque("bloque-platos", false);
   menuDiaActual = null;
@@ -150,17 +192,16 @@ async function buscarMenuPorFecha() {
     setearValorInput("stockTotal", menuDiaActual.stock_total);
     setearValorInput("publicado", String(!!menuDiaActual.publicado));
 
-    mostrarMensaje("Menu encontrado.");
+    mostrarAlertBanner("Menu encontrado.");
     mostrarBloque("bloque-menu", true);
     mostrarBloque("bloque-platos", true);
     await refrescarListaPlatosDelMenu();
-
   } catch (error) {
     // 404: no existe menú
     menuDiaActual = null;
 
-    mostrarMensaje(
-      "No existe un menu para esta fecha. Complete los datos y guarde para crearlo."
+    mostrarAlertBanner(
+      "No existe un menu para esta fecha. Complete los datos y guarde para crearlo.",
     );
     mostrarBloque("bloque-menu", true);
     mostrarBloque("bloque-platos", false);
@@ -182,16 +223,29 @@ async function guardarMenu() {
   const publicadoSeleccionado = obtenerValorInput("publicado") === "true";
 
   if (!fecha) {
-    mostrarMensaje("Debe seleccionar una fecha.");
+    mostrarAlertBanner("Debe seleccionar una fecha.");
     return;
   }
+
+  // Validar si es feriado antes de guardar
+  if (
+    configSistema &&
+    configSistema.feriados &&
+    configSistema.feriados.includes(fecha)
+  ) {
+    mostrarAlertBanner("⚠️ No se pueden crear menús para días feriados.");
+    return;
+  }
+
   if (!descripcion) {
-    mostrarMensaje("La descripción no puede estar vacía.");
+    mostrarAlertBanner("La descripción no puede estar vacía.");
     return;
   }
 
   deshabilitarElemento("btn-guardar-menu", true);
-  mostrarMensaje(menuDiaActual ? "Actualizando menú..." : "Creando menú...");
+  mostrarAlertBanner(
+    menuDiaActual ? "Actualizando menú..." : "Creando menú...",
+  );
 
   try {
     if (!menuDiaActual) {
@@ -216,11 +270,11 @@ async function guardarMenu() {
       // Debe hacerse con PATCH (toggle). Lo manejamos en el evento change del select.
     }
 
-    mostrarMensaje("Guardado correctamente.");
+    mostrarAlertBanner("Guardado correctamente.");
     await buscarMenuPorFecha();
   } catch (error) {
     console.error(error);
-    mostrarMensaje(error.message || "No se pudo guardar el menú.");
+    mostrarAlertBanner(error.message || "No se pudo guardar el menú.");
   } finally {
     deshabilitarElemento("btn-guardar-menu", false);
   }
@@ -229,21 +283,21 @@ async function guardarMenu() {
 async function cambiarEstadoPublicado() {
   if (!menuDiaActual) {
     // no se puede publicar algo que no existe
-    mostrarMensaje("Primero debe crear el menú.");
+    mostrarAlertBanner("Primero debe crear el menú.");
     setearValorInput("publicado", "false");
     return;
   }
 
   deshabilitarElemento("publicado", true);
-  mostrarMensaje("Cambiando estado de publicación...");
+  mostrarAlertBanner("Cambiando estado de publicación...");
 
   try {
     await cambiarEstadoMenuDia(menuDiaActual.idMenuDia);
     await buscarMenuPorFecha();
-    mostrarMensaje("Estado actualizado.");
+    mostrarAlertBanner("Estado actualizado.");
   } catch (error) {
     console.error(error);
-    mostrarMensaje("No se pudo cambiar el estado del menú.");
+    mostrarAlertBanner("No se pudo cambiar el estado del menú.");
     // refrescar para volver al valor real
     await buscarMenuPorFecha();
   } finally {
@@ -295,6 +349,38 @@ function inicializarEventos() {
     inputFecha.value = obtenerFechaHoyISO();
   }
 
+  // Validar feriados cuando cambia la fecha
+  inputFecha?.addEventListener("change", () => {
+    const fechaSeleccionada = inputFecha.value;
+
+    if (
+      configSistema &&
+      configSistema.feriados &&
+      configSistema.feriados.includes(fechaSeleccionada)
+    ) {
+      mostrarMensaje(
+        `⚠️ La fecha ${fechaSeleccionada} es feriado. No se puede crear menú para días feriados.`,
+      );
+
+      // Deshabilitar botón de guardar
+      const btnGuardar = document.getElementById("btn-guardar-menu");
+      if (btnGuardar) {
+        btnGuardar.disabled = true;
+        btnGuardar.style.opacity = "0.5";
+        btnGuardar.title = "No se pueden crear menús en días feriados";
+      }
+    } else {
+      // Re-habilitar botón si no es feriado
+      const btnGuardar = document.getElementById("btn-guardar-menu");
+      if (btnGuardar) {
+        btnGuardar.disabled = false;
+        btnGuardar.style.opacity = "1";
+        btnGuardar.title = "";
+      }
+      mostrarMensaje(""); // Limpiar mensaje
+    }
+  });
+
   botonBuscar?.addEventListener("click", buscarMenuPorFecha);
   botonGuardarMenu?.addEventListener("click", guardarMenu);
   selectorPublicado?.addEventListener("change", cambiarEstadoPublicado);
@@ -303,7 +389,7 @@ function inicializarEventos() {
 
   botonAgregarPlato?.addEventListener("click", async () => {
     if (!menuDiaActual) {
-      mostrarMensaje("Primero debe crear/seleccionar un menu.");
+      mostrarAlertBanner("Primero debe crear/seleccionar un menu.");
       return;
     }
 
@@ -311,17 +397,17 @@ function inicializarEventos() {
     const stockIngresado = Number(obtenerValorInput("stockPlato"));
 
     if (!idPlatoSeleccionado) {
-      mostrarMensaje("Debe seleccionar un plato.");
+      mostrarAlertBanner("Debe seleccionar un plato.");
       return;
     }
 
     if (!Number.isFinite(stockIngresado) || stockIngresado < 0) {
-      mostrarMensaje("El stock debe ser un número válido (0 o mayor).");
+      mostrarAlertBanner("El stock debe ser un número válido (0 o mayor).");
       return;
     }
 
     deshabilitarElemento("btn-agregar-plato", true);
-    mostrarMensaje("Agregando plato al menu...");
+    mostrarAlertBanner("Agregando plato al menu...");
 
     try {
       await agregarPlatoAlMenu({
@@ -331,11 +417,13 @@ function inicializarEventos() {
       });
 
       setearValorInput("stockPlato", "");
-      mostrarMensaje("Plato agregado correctamente.");
+      mostrarAlertBanner("Plato agregado correctamente.");
       await refrescarListaPlatosDelMenu();
     } catch (error) {
       console.error(error);
-      mostrarMensaje(error.message || "No se pudo agregar el plato al menu.");
+      mostrarAlertBanner(
+        error.message || "No se pudo agregar el plato al menu.",
+      );
     } finally {
       deshabilitarElemento("btn-agregar-plato", false);
     }
@@ -346,11 +434,20 @@ async function init() {
   const usuarioAdmin = requireAdmin("./index.html");
   if (!usuarioAdmin) return;
 
+  // Cargar configuración del sistema
+  try {
+    configSistema = await getConfiguracion();
+  } catch (error) {
+    console.error("Error al cargar configuración:", error);
+    mostrarMensaje(
+      "Advertencia: No se pudo cargar la configuración de feriados.",
+    );
+  }
+
   inicializarEventos();
   await cargarSelectPlatos();
   await buscarMenuPorFecha();
-  console.log(document.getElementById("fecha").value)
-
+  console.log(document.getElementById("fecha").value);
 }
 
 init();
