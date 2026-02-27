@@ -11,6 +11,7 @@ import {
   mostrarModalExito,
   inicializarModalConfirmacion,
   getConfiguracion,
+  cerrarModal
 } from "./servicio.js";
 
 let fechaSeleccionadaISO = null;

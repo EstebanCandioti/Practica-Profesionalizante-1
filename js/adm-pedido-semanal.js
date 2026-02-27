@@ -1,8 +1,8 @@
 import {
   requireAdmin,
   getUsuarioActivo,
-  getPedidosSemana,          // <-- tu funciÃ³n actual que lista pedidos semanales
-  confirmarSemanaPedidos,    // <-- la nueva
+  getPedidosSemana,          // funcion actual que lista pedidos semanales
+  confirmarSemanaPedidos,    // la nueva
 } from "./servicio.js";
 
 let pedidosSemanaActual = [];
@@ -89,7 +89,7 @@ async function cargarPedidosSemana() {
     console.error(error);
     setTexto("cantidadPedidos", "Pedidos cargados: 0");
     setTexto("msg", error?.message || "No se pudieron cargar los pedidos.");
-    renderPedidosSemana([]); // limpiar UI si querÃ©s
+    renderPedidosSemana([]); // limpiar UI si queres
   }
 }
 
@@ -98,7 +98,7 @@ async function confirmarSemana() {
   const fechaReferencia = obtenerValorInput("fechaReferencia");
 
   if (!usuarioActivo?.idUsuario) {
-    alert("No se encontrÃ³ el usuario activo.");
+    alert("No se encontro el usuario activo.");
     return;
   }
   if (!fechaReferencia) {
@@ -110,7 +110,7 @@ async function confirmarSemana() {
     return;
   }
 
-  const confirmar = confirm("Esto confirmarÃ¡ TODOS los pedidos de la semana seleccionada. Â¿Continuar?");
+  const confirmar = confirm("Esto confirmara TODOS los pedidos de la semana seleccionada. ¿Continuar?");
   if (!confirmar) return;
 
   const botonConfirmar = document.getElementById("btn-confirmar-semana");

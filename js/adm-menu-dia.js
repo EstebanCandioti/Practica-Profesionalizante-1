@@ -46,6 +46,71 @@ function ocultarAlertBanner() {
 }
 
 /* =======================
+   Validación de Stock Total
+   ======================= */
+
+async function validarStockTotal() {
+  const stockTotal = parseInt(document.getElementById("stockTotal").value) || 0;
+  const fechaSeleccionada = obtenerValorInput("fecha");
+
+  if (!fechaSeleccionada) {
+    return true; // No hay fecha, no validar aún
+  }
+
+  try {
+    // Obtener todos los platos del menú
+    const menuPlatos = await getMenuPlatosPorFecha(fechaSeleccionada);
+
+    // Sumar stocks de todos los platos
+    let sumaStocks = 0;
+    if (Array.isArray(menuPlatos)) {
+      menuPlatos.forEach((menuPlato) => {
+        sumaStocks += menuPlato?.stockDisponible || 0;
+      });
+    }
+
+    const btnGuardar = document.getElementById("btn-guardar-menu");
+
+    // Validar
+    if (sumaStocks > stockTotal) {
+      // ERROR: Suma excede el total
+      mostrarAlertBanner(
+        `❌ Error: La suma de stocks de los platos (${sumaStocks}) supera el stock total del menú (${stockTotal}). Ajustá los stocks o aumentá el stock total.`,
+        "error",
+      );
+      if (btnGuardar) {
+        btnGuardar.disabled = true;
+        btnGuardar.style.opacity = "0.5";
+        btnGuardar.title = "Stock inválido: la suma de platos supera el total";
+      }
+      return false;
+    } else {
+      // OK: Stock válido
+      if (sumaStocks > 0 && stockTotal > 0) {
+        const disponible = stockTotal - sumaStocks;
+        mostrarAlertBanner(
+          `✓ Stock válido: ${sumaStocks} de ${stockTotal} asignado (${disponible} disponible)`,
+          "success",
+        );
+      } else {
+        ocultarAlertBanner();
+      }
+
+      if (btnGuardar) {
+        btnGuardar.disabled = false;
+        btnGuardar.style.opacity = "1";
+        btnGuardar.title = "";
+      }
+      return true;
+    }
+  } catch (error) {
+    console.error("Error al validar stock:", error);
+    // En caso de error, no bloquear
+    return true;
+  }
+}
+
+/* =======================
    Utilidades generales
    ======================= */
 
@@ -147,6 +212,7 @@ async function refrescarListaPlatosDelMenu() {
     contenedorLista.innerHTML =
       "<p>No se pudieron cargar los platos del menu.</p>";
   }
+  await validarStockTotal();
 }
 
 /* =======================
@@ -239,6 +305,16 @@ async function guardarMenu() {
 
   if (!descripcion) {
     mostrarAlertBanner("La descripción no puede estar vacía.");
+    return;
+  }
+
+  // VALIDAR STOCK TOTAL ANTES DE GUARDAR
+  const stockValido = await validarStockTotal();
+  if (!stockValido) {
+    mostrarAlertBanner(
+      "No se puede guardar: la suma de stocks supera el total.",
+      "error",
+    );
     return;
   }
 
@@ -384,6 +460,12 @@ function inicializarEventos() {
   botonBuscar?.addEventListener("click", buscarMenuPorFecha);
   botonGuardarMenu?.addEventListener("click", guardarMenu);
   selectorPublicado?.addEventListener("change", cambiarEstadoPublicado);
+
+  // Validar stock cuando cambia el valor de stockTotal
+  const inputStockTotal = document.getElementById("stockTotal");
+  inputStockTotal?.addEventListener("input", async () => {
+    await validarStockTotal();
+  });
 
   const botonAgregarPlato = document.getElementById("btn-agregar-plato");
 

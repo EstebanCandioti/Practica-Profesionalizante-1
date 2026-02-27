@@ -185,7 +185,7 @@ export async function registrarUsuario(datosRegistro) {
 
 // Listar
 export async function getPlatos() {
-  return await apiFetch("/plato"); // o "/platos" segÃƒÂºn tu controller
+  return await apiFetch("/plato"); // o "/platos" segun controller
 }
 
 // Crear
@@ -203,7 +203,7 @@ export async function modificarPlato(idPlato, payload) {
 
   const idNumero = Number(idPlato);
   if (!Number.isInteger(idNumero)) {
-    throw new Error(`modificarPlato: idPlato invÃƒÂ¡lido (${idPlato})`);
+    throw new Error(`modificarPlato: idPlato invalido (${idPlato})`);
   }
 
   return await apiFetch(`/plato/modificar/${idNumero}`, {
@@ -272,7 +272,7 @@ export async function getMenusDiaPorSemana(fechaReferenciaISO, offset = 1) {
 //       MENU-PLATO
 // =======================
 
-// Obtener menÃƒÂº-platos por fecha (MenuPlato)
+// Obtener menu-platos por fecha (MenuPlato)
 export async function getMenuPlatosPorFecha(fechaISO) {
   return await apiFetch(
     `/menu-plato/fecha?fecha=${encodeURIComponent(fechaISO)}`,
@@ -308,9 +308,9 @@ export async function crearPedido({
 }) {
   const dto = {
     // El DTO CrearPedidoDTO en el servicio usa getUsuario(),
-    // asÃƒÂ­ que acÃƒÂ¡ le mandamos un objeto Usuario mÃƒÂ­nimo con idUsuario
+    // asi­ que aca le mandamos un objeto Usuario mi­nimo con idUsuario
     usuario: { idUsuario },
-    fecha_pedido, // LocalDate en el back Ã¢â€ â€™ "YYYY-MM-DD" en JSON
+    fecha_pedido, // LocalDate en el back "YYYY-MM-DD" en JSON
     cantidad_personas, // int
     estado, // "Pendiente" / "Confirmado" / "Cancelado"
   };
@@ -380,7 +380,7 @@ export async function eliminarPedidoDia(idPedidoDia) {
   const idNumero = Number(idPedidoDia);
   if (!Number.isInteger(idNumero)) {
     throw new Error(
-      `eliminarPedidoDia: idPedidoDia invÃƒÂ¡lido (${idPedidoDia})`,
+      `eliminarPedidoDia: idPedidoDia invalido (${idPedidoDia})`,
     );
   }
 
@@ -464,10 +464,10 @@ export function logout(loginUrl = "./login.html") {
 }
 
 export function requireAdmin(redirectUrl = "./index.html") {
-  const user = requireAuth("./login.html"); // asegura que estÃƒÂ© logueado
+  const user = requireAuth("./login.html"); // asegura que esta logueado
   if (!user) return null;
 
-  // Ajustar segÃƒÂºn lo que devuelva tu API: 'es_usuario_restaurante' o similar.
+  // Ajustar segun lo que devuelva tu API: 'es_usuario_restaurante' o similar.
   const esAdminRestaurante = user.es_usuario_restaurante === true;
 
   if (!esAdminRestaurante) {
@@ -545,7 +545,7 @@ export function mostrarModalError(titulo, mensaje) {
   modal.classList.add("show");
 }
 
-function cerrarModal() {
+export function cerrarModal() {
   const modal = document.getElementById("modal-confirmacion");
   if (modal) {
     modal.classList.remove("show");
